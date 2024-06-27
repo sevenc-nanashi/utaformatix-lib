@@ -53,6 +53,6 @@ mod tests {
 
         let parsed = result.expect("Failed to parse data");
 
-        dbg!(&parsed);
+        insta::assert_debug_snapshot!(parsed);
     }
 }
