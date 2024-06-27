@@ -1,6 +1,6 @@
-[package]
-name = "utaformatix-rs"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["crates/*"]
+resolver = "2"
 
-[dependencies]
+[workspace.package]
+edition = "2021"

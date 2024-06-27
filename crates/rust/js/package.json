@@ -1,0 +1,24 @@
+{
+  "name": "js",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun run ./build.ts"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/bun": "latest",
+    "rollup": "^4.18.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@sevenc-nanashi/utaformatix-ts": "npm:@jsr/sevenc-nanashi__utaformatix-ts",
+    "@web-std/file": "^3.0.3",
+    "fastestsmallesttextencoderdecoder": "^1.0.22",
+    "rollup-plugin-polyfill-node": "^0.13.0"
+  }
+}
