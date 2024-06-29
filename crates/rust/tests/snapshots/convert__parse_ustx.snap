@@ -1,5 +1,5 @@
 ---
-source: crates/rust/src/lib.rs
+source: crates/rust/tests/convert.rs
 expression: parsed
 ---
 UfData {
@@ -67,7 +67,23 @@ UfData {
                         phoneme: None,
                     },
                 ],
-                pitch: None,
+                pitch: Some(
+                    Pitch {
+                        ticks: [
+                            0,
+                            3840,
+                        ],
+                        values: [
+                            Some(
+                                0.0,
+                            ),
+                            Some(
+                                0.0,
+                            ),
+                        ],
+                        is_absolute: false,
+                    },
+                ),
             },
         ],
         time_signatures: [

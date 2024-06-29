@@ -19,6 +19,8 @@ pub enum Format {
     S5p,
     /// Synthesizer V's project file. (`.svp`)
     Svp,
+    /// VoiSona's project file. (`.tssln`)
+    Tssln,
     /// UtaFormatix data. (`.ufdata`)
     UfData,
     /// UTAU's project file. (`.ust`)
@@ -31,6 +33,49 @@ pub enum Format {
     Vsqx,
     /// VOCALOID 5's project file. (`.vpr`)
     Vpr,
+}
+impl Format {
+    /// Returns the file extension of the format.
+    pub fn extension(&self) -> &'static str {
+        match self {
+            Self::StandardMid => "mid",
+            Self::MusicXml => "musicxml",
+            Self::Ccs => "ccs",
+            Self::Dv => "dv",
+            Self::Ustx => "ustx",
+            Self::Ppsf => "ppsf",
+            Self::S5p => "s5p",
+            Self::Svp => "svp",
+            Self::Tssln => "tssln",
+            Self::UfData => "ufdata",
+            Self::Ust => "ust",
+            Self::VocaloidMid => "mid",
+            Self::Vsq => "vsq",
+            Self::Vsqx => "vsqx",
+            Self::Vpr => "vpr",
+        }
+    }
+
+    /// Converts the format to a string for suffix.
+    pub(crate) fn suffix(&self) -> &'static str {
+        match self {
+            Self::StandardMid => "StandardMid",
+            Self::MusicXml => "MusicXml",
+            Self::Ccs => "Ccs",
+            Self::Dv => "Dv",
+            Self::Ustx => "Ustx",
+            Self::Ppsf => "Ppsf",
+            Self::S5p => "S5p",
+            Self::Svp => "Svp",
+            Self::Tssln => "Tssln",
+            Self::UfData => "UfData",
+            Self::Ust => "Ust",
+            Self::VocaloidMid => "VocaloidMid",
+            Self::Vsq => "Vsq",
+            Self::Vsqx => "Vsqx",
+            Self::Vpr => "Vpr",
+        }
+    }
 }
 
 /// Represents the options for parsing data.
@@ -49,6 +94,14 @@ impl Default for ParseOptions {
             default_lyric: "あ".to_string(),
         }
     }
+}
+
+/// Represents the options for generating data.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GenerateOptions {
+    /// Whether to generate the pitch data.
+    pub pitch: bool,
 }
 
 /// Represents the root document object of UtaFormatix data.

@@ -1,12 +1,17 @@
 use crate::{
     error::{Error, Result},
-    model::{Format, ParseOptions, UfData},
+    model::{Format, GenerateOptions, ParseOptions, UfData},
 };
+use std::cell::OnceCell;
+
 use anyhow::anyhow;
-use boa_engine::{js_string, NativeFunction};
+use boa_engine::{
+    js_string,
+    object::builtins::{JsArray, JsTypedArray},
+    JsResult, JsString, JsValue, NativeFunction,
+};
 use educe::Educe;
-use once_cell::sync::Lazy;
-use tracing::info;
+use tracing::{info, warn};
 use uuid::Uuid;
 
 pub(crate) struct Message<T> {
@@ -38,89 +43,92 @@ pub(crate) enum RequestMessageData {
         options: ParseOptions,
         format: Format,
     },
-    Generate(UfData),
+    GenerateSingle {
+        #[educe(Debug(ignore))]
+        data: UfData,
+        options: GenerateOptions,
+        format: Format,
+    },
+    GenerateMultiple {
+        #[educe(Debug(ignore))]
+        data: UfData,
+        options: GenerateOptions,
+        format: Format,
+    },
 }
 
 #[derive(Educe, Clone)]
 #[educe(Debug)]
 pub(crate) enum ResponseMessageData {
-    Panic(String),
+    Panic,
     Parse(Result<UfData>),
-    Generate(Result<Vec<u8>>),
+    GenerateSingle(Result<Vec<u8>>),
     GenerateMultiple(Result<Vec<Vec<u8>>>),
 }
 
-#[derive(Clone, Debug)]
-struct ChannelContainer<T: Clone> {
-    sender: async_channel::Sender<Message<T>>,
-    receiver: async_channel::Receiver<Message<T>>,
+pub(crate) struct SyncThread {
+    pub(crate) handle: OnceCell<std::thread::JoinHandle<()>>,
+    pub(crate) request_sender: async_channel::Sender<Message<RequestMessageData>>,
+    pub(crate) response_receiver: async_channel::Receiver<Message<ResponseMessageData>>,
 }
 
-static CHANNEL: Lazy<(
-    ChannelContainer<RequestMessageData>,
-    ChannelContainer<ResponseMessageData>,
-)> = Lazy::new(|| {
-    let (tx1, rx1) = async_channel::unbounded();
-    let (tx2, rx2) = async_channel::unbounded();
-    (
-        ChannelContainer {
-            sender: tx1,
-            receiver: rx1,
-        },
-        ChannelContainer {
-            sender: tx2,
-            receiver: rx2,
-        },
-    )
-});
+impl Drop for SyncThread {
+    fn drop(&mut self) {
+        info!("Dropping SyncThread");
+        self.request_sender.close();
+        info!("Closed request sender");
+        self.handle
+            .take()
+            .expect("Failed to get handle")
+            .join()
+            .expect("Failed to join thread");
+    }
+}
 
-static RUNNER: std::sync::OnceLock<std::thread::JoinHandle<()>> = std::sync::OnceLock::new();
-
-pub fn channel() -> (
-    async_channel::Sender<Message<RequestMessageData>>,
-    async_channel::Receiver<Message<ResponseMessageData>>,
-) {
-    match RUNNER.get() {
-        Some(handle) => {
-            if handle.is_finished() {
-                panic!("Runner thread has finished unexpectedly");
-            }
-        }
-        None => {
-            let handle = std::thread::spawn(runner_entry);
-            RUNNER.set(handle).unwrap();
+impl SyncThread {
+    pub(crate) fn new() -> Self {
+        let (request_sender, request_receiver) = async_channel::unbounded();
+        let (response_sender, response_receiver) = async_channel::unbounded();
+        let handle = std::thread::spawn(move || {
+            runner_entry(request_receiver, response_sender);
+        });
+        let handle_cell = OnceCell::new();
+        handle_cell.set(handle).expect("Failed to set handle");
+        Self {
+            handle: handle_cell,
+            request_sender,
+            response_receiver,
         }
     }
-
-    let request = CHANNEL.0.clone();
-    let response = CHANNEL.1.clone();
-    (request.sender.clone(), response.receiver.clone())
 }
-
-fn runner_entry() {
+fn runner_entry(
+    receiver: async_channel::Receiver<Message<RequestMessageData>>,
+    sender: async_channel::Sender<Message<ResponseMessageData>>,
+) {
+    info!("JS runner thread started");
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .expect("Failed to create runtime");
 
-    let default_hook = std::panic::take_hook();
-
-    std::panic::set_hook(Box::new(move |panic_info| {
-        default_hook(panic_info);
-
-        let channels = CHANNEL.clone();
-        let sender = channels.1.sender.clone();
+    let main = std::panic::catch_unwind(|| {
+        let sender = sender.clone();
+        rt.block_on(runner_entry_inner(receiver, sender));
+    });
+    if main.is_err() {
         sender
             .send_blocking(Message {
                 nonce: Uuid::new_v4(),
-                message: ResponseMessageData::Panic(format!("{:?}", panic_info)),
+                message: ResponseMessageData::Panic,
             })
             .expect("Failed to send panic message");
-    }));
-    rt.block_on(runner_entry_inner());
+    }
 }
-
-async fn runner_entry_inner() {
+async fn runner_entry_inner(
+    receiver: async_channel::Receiver<Message<RequestMessageData>>,
+    sender: async_channel::Sender<Message<ResponseMessageData>>,
+) {
+    info!("Loading utaformatix");
     let source = boa_engine::Source::from_bytes(include_str!("./utaformatix.js"));
     let queue = std::rc::Rc::new(crate::job_queue::TokioJobQueue::default());
     let mut context = boa_engine::Context::builder()
@@ -130,11 +138,25 @@ async fn runner_entry_inner() {
 
     context
         .register_global_builtin_callable(
-            js_string!("sleep"),
+            js_string!("__sleep"),
             2,
             NativeFunction::from_async_fn(crate::js_impls::sleep),
         )
         .expect("Failed to register sleep function");
+    context
+        .register_global_builtin_callable(
+            js_string!("__encode"),
+            1,
+            NativeFunction::from_fn_ptr(crate::js_impls::encode),
+        )
+        .expect("Failed to register encode function");
+    context
+        .register_global_builtin_callable(
+            js_string!("__decode"),
+            1,
+            NativeFunction::from_fn_ptr(crate::js_impls::decode),
+        )
+        .expect("Failed to register decode function");
     context.eval(source).expect("Failed to evaluate script");
 
     let mut utaformatix = match context
@@ -152,9 +174,10 @@ async fn runner_entry_inner() {
         }
     };
 
-    let channels = CHANNEL.clone();
-    let (sender, receiver) = (channels.1.sender.clone(), channels.0.receiver.clone());
+    info!("Loaded utaformatix");
+
     loop {
+        info!("Waiting for message");
         let Ok(Message { message, nonce }) = receiver.recv_blocking() else {
             info!("Runner channel closed");
             break;
@@ -176,88 +199,61 @@ async fn runner_entry_inner() {
                     })
                     .expect("Failed to send response");
             }
-            _ => {}
+            RequestMessageData::ParseMultiple {
+                data,
+                options,
+                format,
+            } => {
+                let result =
+                    parse_multiple(&mut utaformatix, &mut context, format, data, options).await;
+                info!("Completed parsing multiple: {:?}", result);
+                sender
+                    .send_blocking(Message {
+                        nonce,
+                        message: ResponseMessageData::Parse(result),
+                    })
+                    .expect("Failed to send response");
+            }
+            RequestMessageData::GenerateSingle {
+                data,
+                options,
+                format,
+            } => {
+                let result =
+                    generate_single(&mut utaformatix, &mut context, format, data, options).await;
+                info!("Completed generating: {:?}", result);
+                sender
+                    .send_blocking(Message {
+                        nonce,
+                        message: ResponseMessageData::GenerateSingle(result),
+                    })
+                    .expect("Failed to send response");
+            }
+            RequestMessageData::GenerateMultiple {
+                data,
+                options,
+                format,
+            } => {
+                let result =
+                    generate_multiple(&mut utaformatix, &mut context, format, data, options).await;
+                info!("Completed generating multiple: {:?}", result);
+                sender
+                    .send_blocking(Message {
+                        nonce,
+                        message: ResponseMessageData::GenerateMultiple(result),
+                    })
+                    .expect("Failed to send response");
+            }
         }
+        info!("Sent response");
     }
 }
 
-async fn parse_single(
+fn wrap_error(
+    result: JsResult<boa_engine::JsValue>,
     utaformatix: &mut boa_engine::JsObject,
     context: &mut boa_engine::Context,
-    format: Format,
-    data: Vec<u8>,
-    options: ParseOptions,
-) -> Result<UfData> {
-    let boa_engine::JsValue::Object(uint8array) = context
-        .global_object()
-        .get(js_string!("Uint8Array"), context)
-        .unwrap()
-    else {
-        return Err(anyhow!("Failed to get Uint8Array").into());
-    };
-    let data = uint8array
-        .construct(
-            &[
-                boa_engine::object::builtins::JsUint8Array::from_iter(data, context)
-                    .map_err(|e| anyhow!("Failed to create Uint8Array: {:?}", e))?
-                    .into(),
-            ],
-            None,
-            context,
-        )
-        .map_err(|e| anyhow!("Failed to create Uint8Array: {:?}", e))?;
-    let boa_engine::JsValue::Object(parser) = utaformatix
-        .get(
-            match format {
-                Format::StandardMid => js_string!("parseStandardMid"),
-                Format::MusicXml => js_string!("parseMusicXml"),
-                Format::Ccs => js_string!("parseCcs"),
-                Format::Dv => js_string!("parseDv"),
-                Format::Ustx => js_string!("parseUstx"),
-                Format::Ppsf => js_string!("parsePpsf"),
-                Format::S5p => js_string!("parseS5p"),
-                Format::Svp => js_string!("parseSvp"),
-                Format::UfData => js_string!("parseUfData"),
-                Format::VocaloidMid => js_string!("parseVocaloidMid"),
-                Format::Vsq => js_string!("parseVsq"),
-                Format::Vsqx => js_string!("parseVsqx"),
-                Format::Vpr => js_string!("parseVpr"),
-                _ => return Err(anyhow!("Unsupported format: {:?}", format).into()),
-            },
-            context,
-        )
-        .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
-    if !parser.is_callable() {
-        panic!("Failed to get parse function: Unexpected return value");
-    }
-    let result_promise = parser
-        .call(
-            &boa_engine::JsValue::undefined(),
-            &[
-                data.into(),
-                boa_engine::JsValue::from_json(
-                    &serde_json::to_value(options).expect("Failed to convert to JSON"),
-                    context,
-                )
-                .expect("Failed to convert to JsValue"),
-            ],
-            context,
-        )
-        .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
-    let boa_engine::JsValue::Object(result_promise) = result_promise else {
-        panic!("Failed to call parse function: Unexpected return value");
-    };
-    let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
-        .expect("Failed to convert to JsPromise");
-    let future = result_promise.into_js_future(context);
-
-    let runner = async { context.run_jobs_async().await };
-
-    let (_, result) = tokio::join!(runner, future);
-
+) -> Result<boa_engine::JsValue> {
     let result = result.map_err(|e| {
         let value = e.to_opaque(context);
         for (error, name) in [
@@ -291,16 +287,263 @@ async fn parse_single(
             }
         }
         let value = value.to_json(context).expect("Failed to convert to JSON");
+        warn!("Unexpected error: {:?}", value);
         anyhow!("Unexpected error: {:?}", value).into()
     })?;
+
+    Ok(result)
+}
+
+async fn parse_single(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    format: Format,
+    data: Vec<u8>,
+    options: ParseOptions,
+) -> Result<UfData> {
+    let data = boa_engine::object::builtins::JsUint8Array::from_iter(data, context)
+        .map_err(|e| anyhow!("Failed to create Uint8Array: {:?}", e))?;
+    let function_name = format!("parse{}", format.suffix());
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(JsString::from(function_name), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result_promise = parser
+        .call(
+            &boa_engine::JsValue::undefined(),
+            &[
+                data.into(),
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(options).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+            ],
+            context,
+        )
+        .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
+    let boa_engine::JsValue::Object(result_promise) = result_promise else {
+        panic!("Failed to call parse function: Unexpected return value");
+    };
+    let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
+        .expect("Failed to convert to JsPromise");
+    let future = result_promise.into_js_future(context);
+
+    let runner = async { context.run_jobs_async().await };
+
+    let (_, result) = tokio::join!(runner, future);
+
+    let result = wrap_error(result, utaformatix, context)?;
     if !result.is_object() {
         return Err(anyhow!("Failed to parse: Unexpected return value: {:?}", result).into());
     }
-
     Ok(serde_json::from_value(
         result
             .to_json(context)
             .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
     )
     .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
+}
+
+async fn parse_multiple(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    format: Format,
+    data: Vec<Vec<u8>>,
+    options: ParseOptions,
+) -> Result<UfData> {
+    let data = data
+        .into_iter()
+        .map(|data| boa_engine::object::builtins::JsUint8Array::from_iter(data, context))
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .expect("Failed to create Uint8Array")
+        .into_iter()
+        .map(JsValue::from)
+        .collect::<Vec<JsValue>>();
+
+    let function_name = format!("parse{}", format.suffix());
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(JsString::from(function_name), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result_promise = parser
+        .call(
+            &boa_engine::JsValue::undefined(),
+            &[
+                boa_engine::object::builtins::JsArray::from_iter(data, context).into(),
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(options).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+            ],
+            context,
+        )
+        .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
+    let boa_engine::JsValue::Object(result_promise) = result_promise else {
+        panic!("Failed to call parse function: Unexpected return value");
+    };
+    let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
+        .expect("Failed to convert to JsPromise");
+    let future = result_promise.into_js_future(context);
+
+    let runner = async { context.run_jobs_async().await };
+
+    let (_, result) = tokio::join!(runner, future);
+
+    let result = wrap_error(result, utaformatix, context)?;
+    if !result.is_object() {
+        return Err(anyhow!("Failed to parse: Unexpected return value: {:?}", result).into());
+    }
+    Ok(serde_json::from_value(
+        result
+            .to_json(context)
+            .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
+    )
+    .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
+}
+
+async fn generate_single(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    format: Format,
+    data: UfData,
+    options: GenerateOptions,
+) -> Result<Vec<u8>> {
+    let function_name = format!("generate{}", format.suffix());
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(JsString::from(function_name), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result_promise = parser
+        .call(
+            &boa_engine::JsValue::undefined(),
+            &[
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(data).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(options).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+            ],
+            context,
+        )
+        .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
+    let boa_engine::JsValue::Object(result_promise) = result_promise else {
+        panic!("Failed to call parse function: Unexpected return value");
+    };
+    let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
+        .expect("Failed to convert to JsPromise");
+    let future = result_promise.into_js_future(context);
+
+    let runner = async { context.run_jobs_async().await };
+
+    let (_, result) = tokio::join!(runner, future);
+
+    let result = wrap_error(result, utaformatix, context)?
+        .as_object()
+        .expect("Failed to convert to object")
+        .to_owned();
+    let array = JsTypedArray::from_object(result).expect("Failed to convert to JsTypedArray");
+    let length = array.length(context).expect("Failed to get length");
+    let mut data = Vec::with_capacity(length as usize);
+    for i in 0..length {
+        let value = array.get(i, context).expect("Failed to get value");
+        data.push(value.as_number().expect("Failed to get number") as u8);
+    }
+
+    Ok(data)
+}
+
+async fn generate_multiple(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    format: Format,
+    data: UfData,
+    options: GenerateOptions,
+) -> Result<Vec<Vec<u8>>> {
+    let function_name = format!("generate{}", format.suffix());
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(JsString::from(function_name), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result_promise = parser
+        .call(
+            &boa_engine::JsValue::undefined(),
+            &[
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(data).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+                boa_engine::JsValue::from_json(
+                    &serde_json::to_value(options).expect("Failed to convert to JSON"),
+                    context,
+                )
+                .expect("Failed to convert to JsValue"),
+            ],
+            context,
+        )
+        .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
+    let boa_engine::JsValue::Object(result_promise) = result_promise else {
+        panic!("Failed to call parse function: Unexpected return value");
+    };
+    let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
+        .expect("Failed to convert to JsPromise");
+    let future = result_promise.into_js_future(context);
+
+    let runner = async { context.run_jobs_async().await };
+
+    let (_, result) = tokio::join!(runner, future);
+
+    let result = wrap_error(result, utaformatix, context)?
+        .as_object()
+        .expect("Failed to convert to object")
+        .to_owned();
+    let result = JsArray::from_object(result).expect("Failed to convert to JsArray");
+    let length = result.length(context).expect("Failed to get length");
+    let mut files = vec![];
+    for i in 0..length {
+        let value = result.get(i, context).expect("Failed to get value");
+        let array = JsTypedArray::from_object(
+            value
+                .as_object()
+                .expect("Failed to convert to JsObject")
+                .to_owned(),
+        )
+        .expect("Failed to convert to JsTypedArray");
+        let length = array.length(context).expect("Failed to get length");
+        let mut data = Vec::with_capacity(length as usize);
+        for i in 0..length {
+            let value = array.get(i, context).expect("Failed to get value");
+            data.push(value.as_number().expect("Failed to get number") as u8);
+        }
+        files.push(data);
+    }
+
+    Ok(files)
 }

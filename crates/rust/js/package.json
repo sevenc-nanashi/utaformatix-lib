@@ -6,6 +6,7 @@
     "build": "bun run ./build.ts"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/bun": "latest",
@@ -16,7 +17,8 @@
   },
   "dependencies": {
     "@rollup/plugin-json": "^6.1.0",
-    "@sevenc-nanashi/utaformatix-ts": "npm:@jsr/sevenc-nanashi__utaformatix-ts",
+    "@sevenc-nanashi/utaformatix-ts": "npm:@jsr/sevenc-nanashi__utaformatix-ts@^0.3.2",
+    "@web-std/blob": "^3.0.5",
     "@web-std/file": "^3.0.3",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "rollup-plugin-polyfill-node": "^0.13.0"

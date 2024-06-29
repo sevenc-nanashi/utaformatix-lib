@@ -1,0 +1,41 @@
+---
+source: crates/rust/tests/convert.rs
+expression: parsed
+---
+UfData {
+    format_version: 1,
+    project: Project {
+        name: "data",
+        tracks: [
+            Track {
+                name: "Track",
+                notes: [
+                    Note {
+                        key: 69,
+                        tick_on: 240,
+                        tick_off: 720,
+                        lyric: "ど",
+                        phoneme: Some(
+                            "a",
+                        ),
+                    },
+                ],
+                pitch: None,
+            },
+        ],
+        time_signatures: [
+            TimeSignature {
+                measure_position: 0,
+                numerator: 4,
+                denominator: 4,
+            },
+        ],
+        tempos: [
+            Tempo {
+                tick_position: 0,
+                bpm: 120,
+            },
+        ],
+        measure_prefix: 4,
+    },
+}

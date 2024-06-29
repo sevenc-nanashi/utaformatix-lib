@@ -3,6 +3,7 @@ use boa_engine::{
     job::{FutureJob, JobQueue, NativeJob},
     Context,
 };
+use tracing::{info, warn};
 
 pub(crate) struct TokioJobQueue {
     jobs: std::cell::RefCell<std::collections::VecDeque<NativeJob>>,
@@ -33,6 +34,7 @@ impl JobQueue for TokioJobQueue {
         while let Some(job) = next_job {
             if job.call(context).is_err() {
                 self.jobs.borrow_mut().clear();
+                warn!("Error occurred while running job, clearing job queue");
                 return;
             };
             next_job = self.jobs.borrow_mut().pop_front();
@@ -49,6 +51,7 @@ impl JobQueue for TokioJobQueue {
     {
         Box::pin(async {
             let local = tokio::task::LocalSet::new();
+            info!("Running jobs async");
             local
                 .run_until(async {
                     while !(self.jobs.borrow().is_empty() && self.futures.borrow().is_empty()) {
@@ -61,6 +64,7 @@ impl JobQueue for TokioJobQueue {
                     }
                 })
                 .await;
+            info!("Finished running jobs async");
         })
     }
 }

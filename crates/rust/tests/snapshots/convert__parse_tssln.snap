@@ -1,0 +1,104 @@
+---
+source: crates/rust/tests/convert.rs
+expression: parsed
+---
+UfData {
+    format_version: 1,
+    project: Project {
+        name: "data",
+        tracks: [
+            Track {
+                name: "Singer1",
+                notes: [
+                    Note {
+                        key: 60,
+                        tick_on: 1920,
+                        tick_off: 2400,
+                        lyric: "ド",
+                        phoneme: Some(
+                            "do",
+                        ),
+                    },
+                    Note {
+                        key: 62,
+                        tick_on: 2400,
+                        tick_off: 2880,
+                        lyric: "レ",
+                        phoneme: Some(
+                            "re",
+                        ),
+                    },
+                    Note {
+                        key: 64,
+                        tick_on: 2880,
+                        tick_off: 3360,
+                        lyric: "ミ",
+                        phoneme: Some(
+                            "mi",
+                        ),
+                    },
+                    Note {
+                        key: 65,
+                        tick_on: 3360,
+                        tick_off: 3840,
+                        lyric: "ファ",
+                        phoneme: Some(
+                            "fa",
+                        ),
+                    },
+                    Note {
+                        key: 67,
+                        tick_on: 3840,
+                        tick_off: 4320,
+                        lyric: "ソ",
+                        phoneme: Some(
+                            "so",
+                        ),
+                    },
+                    Note {
+                        key: 69,
+                        tick_on: 4320,
+                        tick_off: 4800,
+                        lyric: "ラ",
+                        phoneme: Some(
+                            "ra",
+                        ),
+                    },
+                    Note {
+                        key: 71,
+                        tick_on: 4800,
+                        tick_off: 5280,
+                        lyric: "シ",
+                        phoneme: Some(
+                            "shi",
+                        ),
+                    },
+                    Note {
+                        key: 72,
+                        tick_on: 5280,
+                        tick_off: 5760,
+                        lyric: "ド",
+                        phoneme: Some(
+                            "do",
+                        ),
+                    },
+                ],
+                pitch: None,
+            },
+        ],
+        time_signatures: [
+            TimeSignature {
+                measure_position: 0,
+                numerator: 4,
+                denominator: 4,
+            },
+        ],
+        tempos: [
+            Tempo {
+                tick_position: 0,
+                bpm: 120,
+            },
+        ],
+        measure_prefix: 1,
+    },
+}
