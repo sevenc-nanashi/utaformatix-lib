@@ -4,6 +4,7 @@ use crate::{
     model::{Format, GenerateOptions, ParseOptions},
     process::SyncThread,
 };
+use crate::{ConvertJapaneseLyricsOptions, JapaneseLyricsType};
 use duplicate::duplicate_item;
 use tracing::info;
 
@@ -92,8 +93,8 @@ impl UtaFormatix {
     }
 
     #[duplicate_item(
-        fn_name              format_enum   kind;
-        [parse_ust]          [Format::Ust]["UTAU's project"];
+        fn_name     format_enum   kind;
+        [parse_ust] [Format::Ust] ["UTAU's project"];
     )]
     #[doc = "Parses a "]
     #[doc = kind]
@@ -160,5 +161,38 @@ impl UtaFormatix {
             });
 
         send_and_receive!(self, message, GenerateMultiple)
+    }
+
+    /// Analyzes the type of Japanese lyrics.
+    /// Returns `None` if the lyrics type cannot be determined.
+    pub async fn analyze_japanese_lyrics_type(
+        &self,
+        data: UfData,
+    ) -> Result<Option<JapaneseLyricsType>> {
+        let message = crate::process::Message::new(
+            crate::process::RequestMessageData::AnalyzeJapaneseLyricsType { data },
+        );
+
+        send_and_receive!(self, message, AnalyzeJapaneseLyricsType)
+    }
+
+    /// Converts Japanese lyrics.
+    pub async fn convert_japanese_lyrics(
+        &self,
+        data: UfData,
+        source_type: JapaneseLyricsType,
+        target_type: JapaneseLyricsType,
+        options: ConvertJapaneseLyricsOptions,
+    ) -> Result<UfData> {
+        let message = crate::process::Message::new(
+            crate::process::RequestMessageData::ConvertJapaneseLyrics {
+                data,
+                source_type,
+                target_type,
+                options,
+            },
+        );
+
+        send_and_receive!(self, message, ConvertJapaneseLyrics)
     }
 }

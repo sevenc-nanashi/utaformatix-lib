@@ -5,8 +5,8 @@ use tracing_test::traced_test;
 use utaformatix_rs::{GenerateOptions, ParseOptions};
 
 #[rstest::fixture]
-fn utaformatix() -> utaformatix_rs::UtaFormatix {
-    utaformatix_rs::UtaFormatix::new()
+fn utaformatix() -> utaformatix_rs::base::UtaFormatix {
+    utaformatix_rs::base::UtaFormatix::new()
 }
 
 #[duplicate_item(
@@ -27,7 +27,7 @@ fn utaformatix() -> utaformatix_rs::UtaFormatix {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::UtaFormatix) {
+async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
     let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
     let options = ParseOptions::default();
     let result = utaformatix.function(data, options).await;
@@ -44,7 +44,7 @@ async fn test_name(utaformatix: utaformatix_rs::UtaFormatix) {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::UtaFormatix) {
+async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
     let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
     let options = ParseOptions::default();
     let result = utaformatix.function(&[data], options).await;
@@ -61,7 +61,7 @@ async fn test_name(utaformatix: utaformatix_rs::UtaFormatix) {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::UtaFormatix) {
+async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
     let data = include_bytes!("../utaformatix-ts/testAssets/generated/standard.mid");
     let ufdata = utaformatix
         .parse_standard_mid(data, ParseOptions::default())

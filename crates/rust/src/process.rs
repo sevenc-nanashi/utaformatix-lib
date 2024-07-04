@@ -1,8 +1,9 @@
 use crate::{
     error::{Error, Result},
-    model::{Format, GenerateOptions, ParseOptions, UfData},
+    model::{Format, GenerateOptions, JapaneseLyricsType, ParseOptions, UfData},
+    ConvertJapaneseLyricsOptions, IllegalFile,
 };
-use std::cell::OnceCell;
+use std::{cell::OnceCell, str::FromStr};
 
 use anyhow::anyhow;
 use boa_engine::{
@@ -55,6 +56,17 @@ pub(crate) enum RequestMessageData {
         options: GenerateOptions,
         format: Format,
     },
+    AnalyzeJapaneseLyricsType {
+        #[educe(Debug(ignore))]
+        data: UfData,
+    },
+    ConvertJapaneseLyrics {
+        #[educe(Debug(ignore))]
+        data: UfData,
+        source_type: JapaneseLyricsType,
+        target_type: JapaneseLyricsType,
+        options: ConvertJapaneseLyricsOptions,
+    },
 }
 
 #[derive(Educe, Clone)]
@@ -64,6 +76,8 @@ pub(crate) enum ResponseMessageData {
     Parse(Result<UfData>),
     GenerateSingle(Result<Vec<u8>>),
     GenerateMultiple(Result<Vec<Vec<u8>>>),
+    AnalyzeJapaneseLyricsType(Result<Option<JapaneseLyricsType>>),
+    ConvertJapaneseLyrics(Result<UfData>),
 }
 
 pub(crate) struct SyncThread {
@@ -191,7 +205,7 @@ async fn runner_entry_inner(
             } => {
                 let result =
                     parse_single(&mut utaformatix, &mut context, format, data, options).await;
-                info!("Completed parsing: {:?}", result);
+                info!("Completed parsing");
                 sender
                     .send_blocking(Message {
                         nonce,
@@ -206,7 +220,7 @@ async fn runner_entry_inner(
             } => {
                 let result =
                     parse_multiple(&mut utaformatix, &mut context, format, data, options).await;
-                info!("Completed parsing multiple: {:?}", result);
+                info!("Completed parsing multiple");
                 sender
                     .send_blocking(Message {
                         nonce,
@@ -221,7 +235,7 @@ async fn runner_entry_inner(
             } => {
                 let result =
                     generate_single(&mut utaformatix, &mut context, format, data, options).await;
-                info!("Completed generating: {:?}", result);
+                info!("Completed generating");
                 sender
                     .send_blocking(Message {
                         nonce,
@@ -236,11 +250,43 @@ async fn runner_entry_inner(
             } => {
                 let result =
                     generate_multiple(&mut utaformatix, &mut context, format, data, options).await;
-                info!("Completed generating multiple: {:?}", result);
+                info!("Completed generating multiple");
                 sender
                     .send_blocking(Message {
                         nonce,
                         message: ResponseMessageData::GenerateMultiple(result),
+                    })
+                    .expect("Failed to send response");
+            }
+            RequestMessageData::AnalyzeJapaneseLyricsType { data } => {
+                let result = analyze_japanese_lyrics_type(&mut utaformatix, &mut context, data);
+                info!("Completed analyzing Japanese lyrics type: {:?}", result);
+                sender
+                    .send_blocking(Message {
+                        nonce,
+                        message: ResponseMessageData::AnalyzeJapaneseLyricsType(result),
+                    })
+                    .expect("Failed to send response");
+            }
+            RequestMessageData::ConvertJapaneseLyrics {
+                data,
+                source_type,
+                target_type,
+                options,
+            } => {
+                let result = convert_japanese_lyrics(
+                    &mut utaformatix,
+                    &mut context,
+                    data,
+                    source_type,
+                    target_type,
+                    options,
+                );
+                info!("Completed converting Japanese lyrics");
+                sender
+                    .send_blocking(Message {
+                        nonce,
+                        message: ResponseMessageData::ConvertJapaneseLyrics(result),
                     })
                     .expect("Failed to send response");
             }
@@ -258,7 +304,6 @@ fn wrap_error(
         let value = e.to_opaque(context);
         for (error, name) in [
             (Error::EmptyProject, js_string!("EmptyProjectException")),
-            (Error::IllegalFile, js_string!("IllegalFileException")),
             (
                 Error::IllegalNotePosition,
                 js_string!("IllegalNotePositionException"),
@@ -285,6 +330,28 @@ fn wrap_error(
             {
                 return error;
             }
+        }
+        let illegal_file_exception = utaformatix
+            .get(js_string!("IllegalFileException"), context)
+            .expect("Failed to get exception");
+        if value
+            .instance_of(&illegal_file_exception, context)
+            .expect("Failed to check instance")
+        {
+            let value = value.as_object().expect("Failed to convert to object");
+            let name = value
+                .get(js_string!("constructor"), context)
+                .expect("Failed to get constructor")
+                .as_object()
+                .expect("Failed to convert to object")
+                .get(js_string!("name"), context)
+                .expect("Failed to get name")
+                .as_string()
+                .expect("Failed to convert to string")
+                .to_std_string()
+                .expect("Failed to convert to string");
+            let kind = IllegalFile::from_str(&name).expect("Failed to convert to IllegalFile");
+            return Error::IllegalFile(kind);
         }
         let value = value.to_json(context).expect("Failed to convert to JSON");
         warn!("Unexpected error: {:?}", value);
@@ -546,4 +613,82 @@ async fn generate_multiple(
     }
 
     Ok(files)
+}
+
+fn analyze_japanese_lyrics_type(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    data: UfData,
+) -> Result<Option<JapaneseLyricsType>> {
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(js_string!("analyzeJapaneseLyricsType"), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result = parser.call(
+        &boa_engine::JsValue::undefined(),
+        &[boa_engine::JsValue::from_json(
+            &serde_json::to_value(data).expect("Failed to convert to JSON"),
+            context,
+        )
+        .expect("Failed to convert to JsValue")],
+        context,
+    );
+    let result = wrap_error(result, utaformatix, context)?
+        .as_string()
+        .expect("Failed to convert to string")
+        .to_owned();
+    let result = result.to_std_string().expect("Failed to convert to string");
+    let result = JapaneseLyricsType::from_str(&result).ok();
+
+    Ok(result)
+}
+
+fn convert_japanese_lyrics(
+    utaformatix: &mut boa_engine::JsObject,
+    context: &mut boa_engine::Context,
+    data: UfData,
+    source: JapaneseLyricsType,
+    to: JapaneseLyricsType,
+    options: ConvertJapaneseLyricsOptions,
+) -> Result<UfData> {
+    let boa_engine::JsValue::Object(parser) = utaformatix
+        .get(js_string!("convertJapaneseLyrics"), context)
+        .expect("Failed to get parse function")
+    else {
+        panic!("Failed to get parse function: Unexpected return value");
+    };
+    if !parser.is_callable() {
+        panic!("Failed to get parse function: Unexpected return value");
+    }
+    let result = parser.call(
+        &boa_engine::JsValue::undefined(),
+        &[
+            boa_engine::JsValue::from_json(
+                &serde_json::to_value(data).expect("Failed to convert to JSON"),
+                context,
+            )
+            .expect("Failed to convert to JsValue"),
+            JsString::from(source.to_string()).into(),
+            JsString::from(to.to_string()).into(),
+            boa_engine::JsValue::from_json(
+                &serde_json::to_value(options).expect("Failed to convert to JSON"),
+                context,
+            )
+            .expect("Failed to convert to JsValue"),
+        ],
+        context,
+    );
+    let result = wrap_error(result, utaformatix, context)?;
+
+    Ok(serde_json::from_value(
+        result
+            .to_json(context)
+            .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
+    )
+    .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
 }

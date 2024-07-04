@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use strum::{Display, EnumString};
 
 /// Represents the format of the data.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
@@ -102,6 +103,28 @@ impl Default for ParseOptions {
 pub struct GenerateOptions {
     /// Whether to generate the pitch data.
     pub pitch: bool,
+}
+
+/// Represents the type of lyrics.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, EnumString, Display)]
+#[serde(rename_all = "camelCase")]
+pub enum JapaneseLyricsType {
+    /// Hiragana, CV (あ, い, う)
+    KanaCv,
+    /// Hiragana, VCV (あ, a い, i う)
+    KanaVcv,
+    /// Romaji, CV (a, i, u)
+    RomajiCv,
+    /// Romaji, VCV (a, a i, i u)
+    RomajiVcv,
+}
+
+/// Represents the options for converting Japanese lyrics.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConvertJapaneseLyricsOptions {
+    /// Whether to convert vowel connections. (e.g. "あー" -> "ああ")
+    pub convert_vowel_connections: bool,
 }
 
 /// Represents the root document object of UtaFormatix data.
