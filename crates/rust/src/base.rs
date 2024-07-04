@@ -1,3 +1,4 @@
+//! Contains the low-level interface to UtaFormatix.
 use crate::error::Result;
 use crate::model::UfData;
 use crate::{
@@ -53,6 +54,10 @@ macro_rules! send_and_receive {
 
 impl UtaFormatix {
     /// Creates a new instance of `UtaFormatix`.
+    ///
+    /// This function initializes the JS thread, so it is recommended to create only one instance
+    /// of `UtaFormatix`, or use [`crate::Project`], which only creates one instance of
+    /// `UtaFormatix`.
     pub fn new() -> Self {
         let inner = SyncThread::new();
         Self { inner }
