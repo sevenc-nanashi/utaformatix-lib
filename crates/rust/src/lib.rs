@@ -4,6 +4,10 @@ mod job_queue;
 mod js_impls;
 mod model;
 mod process;
+mod project;
 
 pub use error::*;
-pub use model::*;
+pub use model::{
+    ConvertJapaneseLyricsOptions, GenerateOptions, JapaneseLyricsType, ParseOptions, UfData,
+};
+pub use project::*;

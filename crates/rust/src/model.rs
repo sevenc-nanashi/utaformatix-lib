@@ -137,7 +137,7 @@ pub struct UfData {
     format_version: i32,
     // TODO: Support multiple versions: https://github.com/serde-rs/serde/issues/745
     /// Project object.
-    project: Project,
+    project: UfProject,
 }
 
 /// Represents the project object of UtaFormatix data v1.
@@ -145,7 +145,7 @@ pub struct UfData {
 /// See: <https://github.com/sdercolin/utaformatix-data?tab=readme-ov-file#project-object>
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Project {
+pub struct UfProject {
     /// Project name.
     pub name: String,
     /// Track list.

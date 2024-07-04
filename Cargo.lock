@@ -1609,6 +1609,7 @@ dependencies = [
  "educe",
  "encoding_rs",
  "insta",
+ "once_cell",
  "rstest",
  "serde",
  "serde_json",

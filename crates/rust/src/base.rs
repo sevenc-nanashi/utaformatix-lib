@@ -99,6 +99,7 @@ impl UtaFormatix {
     #[doc = "Parses a "]
     #[doc = kind]
     #[doc = " file."]
+    /// You can pass multiple files to parse at once, each file will be parsed as a track.
     pub async fn fn_name(
         &self,
         data: &[&[u8]],
@@ -132,10 +133,10 @@ impl UtaFormatix {
     #[doc = "Generates a "]
     #[doc = kind]
     #[doc = " file."]
-    pub async fn fn_name(&self, data: UfData, options: GenerateOptions) -> Result<Vec<u8>> {
+    pub async fn fn_name(&self, data: &UfData, options: GenerateOptions) -> Result<Vec<u8>> {
         let message =
             crate::process::Message::new(crate::process::RequestMessageData::GenerateSingle {
-                data,
+                data: data.clone(),
                 options,
                 format: format_enum,
             });
@@ -152,10 +153,10 @@ impl UtaFormatix {
     #[doc = kind]
     #[doc = " file."]
     /// Returns the bytes of the generated file, each representing a track.
-    pub async fn fn_name(&self, data: UfData, options: GenerateOptions) -> Result<Vec<Vec<u8>>> {
+    pub async fn fn_name(&self, data: &UfData, options: GenerateOptions) -> Result<Vec<Vec<u8>>> {
         let message =
             crate::process::Message::new(crate::process::RequestMessageData::GenerateMultiple {
-                data,
+                data: data.clone(),
                 options,
                 format: format_enum,
             });
