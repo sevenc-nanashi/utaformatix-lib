@@ -1,9 +1,9 @@
-use strum::EnumString;
+use strum::{AsRefStr, EnumString};
 use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Clone, Error)]
+#[derive(Debug, Clone, Error, AsRefStr)]
 /// Represents an error that can occur during the conversion process.
 pub enum Error {
     #[error("The project is empty.")]

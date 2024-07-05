@@ -1,6 +1,6 @@
 [package]
-name = "utaformatix-rs"
-version = "0.1.0"
+name = "utaformatix"
+version.workspace = true
 edition.workspace = true
 
 [dependencies]

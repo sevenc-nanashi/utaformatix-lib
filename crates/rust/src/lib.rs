@@ -1,4 +1,4 @@
-//! utaformatix-rs is a library that allows you to use UtaFormatix in Rust.
+//! utaformatix is a library that allows you to use UtaFormatix in Rust.
 pub mod base;
 mod error;
 mod job_queue;
