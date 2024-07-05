@@ -1,4 +1,42 @@
 module UtaFormatix
   VERSION: String
   # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+  type ufdata = { formatVersion: Integer, project: untyped }
+
+  class Core
+    #          [parse_standard_mid];
+    #          [parse_music_xml];
+    #          [parse_ccs];
+    #          [parse_dv];
+    #          [parse_ustx];
+    #          [parse_ppsf];
+    #          [parse_s5p];
+    #          [parse_svp];
+    #          [parse_tssln];
+    #          [parse_uf_data];
+    #          [parse_vocaloid_mid];
+    #          [parse_vsq];
+    #          [parse_vsqx];
+    #          [parse_vpr];
+    def parse_standard_mid: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_music_xml: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_ccs: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_dv: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_ustx: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_ppsf: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_s5p: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_svp: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_tssln: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_ust: ((String | Array[String]) source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_uf_data: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_vocaloid_mid: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_vsq: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_vsqx: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+    def parse_vpr: (String source, ?pitch: bool, ?default_lyric: String) -> ufdata
+
+
+
+  end
 end
+
+# vim: syntax=ruby

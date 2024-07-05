@@ -12,7 +12,7 @@ use boa_engine::{
     JsResult, JsString, JsValue, NativeFunction,
 };
 use educe::Educe;
-use tracing::{info, warn};
+use tracing::info;
 use uuid::Uuid;
 
 pub(crate) struct Message<T> {
@@ -353,9 +353,12 @@ fn wrap_error(
             let kind = IllegalFile::from_str(&name).expect("Failed to convert to IllegalFile");
             return Error::IllegalFile(kind);
         }
-        let value = value.to_json(context).expect("Failed to convert to JSON");
-        warn!("Unexpected error: {:?}", value);
-        anyhow!("Unexpected error: {:?}", value).into()
+
+        let value = value.to_string(context).map_or_else(
+            |_| "Unknown error".to_owned(),
+            |v| v.to_std_string_escaped(),
+        );
+        Error::Unexpected(value)
     })?;
 
     Ok(result)
