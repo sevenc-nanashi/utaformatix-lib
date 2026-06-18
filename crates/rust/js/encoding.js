@@ -1,6 +1,6 @@
 export class TextEncoder {
   encode(str) {
-    return __encode(str);
+    return __host_encode(str);
   }
 }
 export class TextDecoder {
@@ -9,6 +9,6 @@ export class TextDecoder {
     this.encoding = encoding;
   }
   decode(bytes) {
-    return __decode(bytes, this.encoding);
+    return __host_decode(bytes, this.encoding);
   }
 }

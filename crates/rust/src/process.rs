@@ -152,25 +152,62 @@ async fn runner_entry_inner(
 
     context
         .register_global_builtin_callable(
-            js_string!("__sleep"),
+            js_string!("__host_sleep"),
             2,
             NativeFunction::from_async_fn(crate::js_impls::sleep),
         )
         .expect("Failed to register sleep function");
     context
         .register_global_builtin_callable(
-            js_string!("__encode"),
+            js_string!("__host_encode"),
             1,
             NativeFunction::from_fn_ptr(crate::js_impls::encode),
         )
         .expect("Failed to register encode function");
     context
         .register_global_builtin_callable(
-            js_string!("__decode"),
+            js_string!("__host_decode"),
             1,
             NativeFunction::from_fn_ptr(crate::js_impls::decode),
         )
         .expect("Failed to register decode function");
+    context
+        .register_global_builtin_callable(
+            js_string!("__host_log"),
+            1,
+            NativeFunction::from_fn_ptr(|_this, args, _context| {
+                let level = args
+                    .first()
+                    .ok_or_else(|| {
+                        boa_engine::JsNativeError::error().with_message("Missing log level")
+                    })?
+                    .as_number()
+                    .ok_or_else(|| {
+                        boa_engine::JsNativeError::error().with_message("Invalid log level")
+                    })? as u8;
+                let message = args
+                    .get(1)
+                    .ok_or_else(|| {
+                        boa_engine::JsNativeError::error().with_message("Missing log message")
+                    })?
+                    .as_string()
+                    .ok_or_else(|| {
+                        boa_engine::JsNativeError::error().with_message("Invalid log message")
+                    })?
+                    .to_std_string()
+                    .map_err(|_| {
+                        boa_engine::JsNativeError::error().with_message("Invalid log message")
+                    })?;
+                match level {
+                    0 => info!("[JS] {}", message),
+                    1 => tracing::warn!("[JS] {}", message),
+                    2 => tracing::error!("[JS] {}", message),
+                    _ => tracing::warn!("[JS] {}", message),
+                }
+                Ok(boa_engine::JsValue::undefined())
+            }),
+        )
+        .expect("Failed to register log function");
     context.eval(source).expect("Failed to evaluate script");
 
     let mut utaformatix = match context

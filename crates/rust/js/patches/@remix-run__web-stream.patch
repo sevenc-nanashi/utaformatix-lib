@@ -1,0 +1,26 @@
+diff --git a/package.json b/package.json
+index c56ab157c9cf820985f19724ef6eba9e0d628050..29c34c36b63e192d27c92317d0eba418bb331439 100644
+--- a/package.json
++++ b/package.json
+@@ -15,18 +15,18 @@
+     "typescript"
+   ],
+   "type": "module",
+-  "module": "./src/lib.js",
++  "module": "./src/lib.node.js",
+   "main": "./src/stream.cjs",
+   "types": "./src/lib.d.ts",
+   "browser": {
+-    "./src/lib.node.js": "./src/lib.js"
++    "./src/lib.node.js": "./src/lib.node.js"
+   },
+   "exports": {
+     ".": {
+       "types": "./src/lib.d.ts",
+       "browser": {
+         "require": "./src/stream.cjs",
+-        "import": "./src/lib.js"
++        "import": "./src/lib.node.js"
+       },
+       "require": "./src/stream.cjs",
+       "import": "./src/lib.node.js"

@@ -4,7 +4,7 @@ expression: parsed
 ---
 UfData {
     format_version: 1,
-    project: Project {
+    project: UfProject {
         name: "data.mid",
         tracks: [
             Track {
@@ -83,7 +83,13 @@ UfData {
                         ),
                     },
                 ],
-                pitch: None,
+                pitch: Some(
+                    Pitch {
+                        ticks: [],
+                        values: [],
+                        is_absolute: false,
+                    },
+                ),
             },
         ],
         time_signatures: [

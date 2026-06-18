@@ -1,12 +1,10 @@
-extern crate utaformatix_rs;
-
 use duplicate::duplicate_item;
 use tracing_test::traced_test;
-use utaformatix_rs::{GenerateOptions, ParseOptions};
+use utaformatix::{GenerateOptions, ParseOptions};
 
 #[rstest::fixture]
-fn utaformatix() -> utaformatix_rs::base::UtaFormatix {
-    utaformatix_rs::base::UtaFormatix::new()
+fn utaformatix_instance() -> utaformatix::base::UtaFormatix {
+    utaformatix::base::UtaFormatix::new()
 }
 
 #[duplicate_item(
@@ -27,10 +25,10 @@ fn utaformatix() -> utaformatix_rs::base::UtaFormatix {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
+async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
     let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
     let options = ParseOptions::default();
-    let result = utaformatix.function(data, options).await;
+    let result = utaformatix_instance.function(data, options).await;
 
     let parsed = result.expect("Failed to parse data");
 
@@ -44,10 +42,10 @@ async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
+async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
     let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
     let options = ParseOptions::default();
-    let result = utaformatix.function(&[data], options).await;
+    let result = utaformatix_instance.function(&[data], options).await;
 
     let parsed = result.expect("Failed to parse data");
 
@@ -61,14 +59,14 @@ async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn test_name(utaformatix: utaformatix_rs::base::UtaFormatix) {
+async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
     let data = include_bytes!("../utaformatix-ts/testAssets/generated/standard.mid");
-    let ufdata = utaformatix
+    let ufdata = utaformatix_instance
         .parse_standard_mid(data, ParseOptions::default())
         .await
         .expect("Failed to parse data");
     let options = GenerateOptions::default();
-    let result = utaformatix.function(ufdata, options).await;
+    let result = utaformatix_instance.function(&ufdata, options).await;
 
     result.expect("Failed to generate data");
 }

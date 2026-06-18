@@ -1,44 +1,44 @@
 use tracing_test::traced_test;
-use utaformatix_rs::ParseOptions;
+use utaformatix::ParseOptions;
 
 #[rstest::fixture]
-fn utaformatix() -> utaformatix_rs::base::UtaFormatix {
-    utaformatix_rs::base::UtaFormatix::new()
+fn utaformatix_instance() -> utaformatix::base::UtaFormatix {
+    utaformatix::base::UtaFormatix::new()
 }
 
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn analyze_japanese_lyrics_type(utaformatix: utaformatix_rs::base::UtaFormatix) {
+async fn analyze_japanese_lyrics_type(utaformatix_instance: utaformatix::base::UtaFormatix) {
     let data = include_bytes!("../utaformatix-ts/testAssets/tsukuyomi_vcv.ust");
     let options = ParseOptions::default();
-    let result = utaformatix.parse_ust(&[data], options).await;
+    let result = utaformatix_instance.parse_ust(&[data], options).await;
 
     let parsed = result.expect("Failed to parse data");
 
-    let result = utaformatix
+    let result = utaformatix_instance
         .analyze_japanese_lyrics_type(parsed)
         .await
         .expect("Failed to analyze Japanese lyrics type");
 
-    assert_eq!(result, Some(utaformatix_rs::JapaneseLyricsType::KanaVcv));
+    assert_eq!(result, Some(utaformatix::JapaneseLyricsType::KanaVcv));
 }
 
 #[rstest::rstest]
 #[tokio::test]
 #[traced_test]
-async fn convert_japanese_lyrics(utaformatix: utaformatix_rs::base::UtaFormatix) {
+async fn convert_japanese_lyrics(utaformatix_instance: utaformatix::base::UtaFormatix) {
     let data = include_bytes!("../utaformatix-ts/testAssets/tsukuyomi_vcv.ust");
     let options = ParseOptions::default();
-    let result = utaformatix.parse_ust(&[data], options).await;
+    let result = utaformatix_instance.parse_ust(&[data], options).await;
 
     let parsed = result.expect("Failed to parse data");
 
-    let result = utaformatix
+    let result = utaformatix_instance
         .convert_japanese_lyrics(
             parsed,
-            utaformatix_rs::JapaneseLyricsType::KanaVcv,
-            utaformatix_rs::JapaneseLyricsType::KanaCv,
+            utaformatix::JapaneseLyricsType::KanaVcv,
+            utaformatix::JapaneseLyricsType::KanaCv,
             Default::default(),
         )
         .await

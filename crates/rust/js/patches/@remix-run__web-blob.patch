@@ -1,0 +1,22 @@
+diff --git a/package.json b/package.json
+index 1bb110d95598797c39db175e2c840add85dca54e..42594f6b056d5f357bbf82aade7479e9bfd5f253 100644
+--- a/package.json
++++ b/package.json
+@@ -13,7 +13,7 @@
+     "Readme.md"
+   ],
+   "type": "module",
+-  "module": "./src/lib.js",
++  "module": "./src/lib.node.js",
+   "main": "./dist/src/lib.node.cjs",
+   "types": "./dist/src/lib.d.ts",
+   "exports": {
+@@ -21,7 +21,7 @@
+       "types": "./dist/src/lib.d.ts",
+       "browser": {
+         "require": "./dist/src/lib.cjs",
+-        "import": "./src/lib.js"
++        "import": "./src/lib.node.js"
+       },
+       "require": "./dist/src/lib.node.cjs",
+       "import": "./src/lib.node.js"

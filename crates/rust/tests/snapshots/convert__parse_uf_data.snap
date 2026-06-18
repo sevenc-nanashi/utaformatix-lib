@@ -4,7 +4,7 @@ expression: parsed
 ---
 UfData {
     format_version: 1,
-    project: Project {
+    project: UfProject {
         name: "expla1n_self",
         tracks: [
             Track {

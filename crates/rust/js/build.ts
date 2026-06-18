@@ -1,26 +1,12 @@
-import { rollup } from "rollup";
-import commonjs from "@rollup/plugin-commonjs";
-import nodeResolve from "@rollup/plugin-node-resolve";
-import json from "@rollup/plugin-json";
-import polyfill from "rollup-plugin-polyfill-node";
-import alias from "@rollup/plugin-alias";
+import { rolldown } from "rolldown";
 
-const bundle = await rollup({
+const bundle = await rolldown({
   input: `${import.meta.dirname}/entry.js`,
-  plugins: [
-    commonjs(),
-    json(),
-    nodeResolve(),
-    polyfill(),
-    alias({
-      entries: [
-        {
-          find: "web-encoding",
-          replacement: `${import.meta.dirname}/encoding.js`,
-        },
-      ],
-    }),
-  ],
+  resolve: {
+    alias: {
+      "web-encoding": `${import.meta.dirname}/encoding.js`,
+    },
+  },
 });
 
 await bundle.write({
