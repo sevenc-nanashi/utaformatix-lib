@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/ruby/version"
+require_relative "lib/utaformatix/version"
 
 Gem::Specification.new do |spec|
   spec.name = "utaformatix"

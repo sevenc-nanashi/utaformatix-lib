@@ -16,6 +16,7 @@ utaformatix-lib is a library that allows you to use UtaFormatix in many programm
 
 - The library contains JS runtime, [Boa JS](https://boajs.dev).
 - The library embeds [utaformatix-ts](https://github.com/sevenc-nanashi/utaformatix-ts), and uses it to run UtaFormatix code.
+  - There are some polyfills for filling the gap between Node.js and Boa JS. See [crates/rust/js] for details.
 
 ## License
 

@@ -3,19 +3,17 @@ use boa_engine::{
     object::builtins::{JsArray, JsTypedArray},
     Context, JsArgs, JsNativeError, JsResult, JsString, JsValue,
 };
-use std::future::Future;
+use std::cell::RefCell;
 use tracing::info;
 
-pub fn sleep(
+pub async fn sleep(
     _this: &JsValue,
     args: &[JsValue],
-    context: &mut Context,
-) -> impl Future<Output = JsResult<JsValue>> {
-    let delay = args.get_or_undefined(0).to_u32(context).unwrap();
-    async move {
-        tokio::time::sleep(std::time::Duration::from_millis(u64::from(delay))).await;
-        Ok(JsValue::undefined())
-    }
+    context: &RefCell<&mut Context>,
+) -> JsResult<JsValue> {
+    let delay = args.get_or_undefined(0).to_u32(&mut context.borrow_mut())?;
+    tokio::time::sleep(std::time::Duration::from_millis(u64::from(delay))).await;
+    Ok(JsValue::undefined())
 }
 
 pub fn encode(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
@@ -71,7 +69,30 @@ pub fn decode(_this: &JsValue, args: &[JsValue], context: &mut Context) -> JsRes
 
     let (decoded, _, _) = encoding.decode(&data);
 
-    let result_string = JsValue::String(JsString::from(decoded.to_string()));
+    let result_string = JsValue::new(JsString::from(decoded.to_string()));
 
     Ok(result_string)
+}
+
+pub fn log(_this: &JsValue, args: &[JsValue], _context: &mut Context) -> JsResult<JsValue> {
+    let level = args
+        .first()
+        .ok_or_else(|| boa_engine::JsNativeError::error().with_message("Missing log level"))?
+        .as_number()
+        .ok_or_else(|| boa_engine::JsNativeError::error().with_message("Invalid log level"))?
+        as u8;
+    let message = args
+        .get(1)
+        .ok_or_else(|| boa_engine::JsNativeError::error().with_message("Missing log message"))?
+        .as_string()
+        .ok_or_else(|| boa_engine::JsNativeError::error().with_message("Invalid log message"))?
+        .to_std_string()
+        .map_err(|_| boa_engine::JsNativeError::error().with_message("Invalid log message"))?;
+    match level {
+        0 => info!("[JS] {}", message),
+        1 => tracing::warn!("[JS] {}", message),
+        2 => tracing::error!("[JS] {}", message),
+        _ => tracing::warn!("[JS] {}", message),
+    }
+    Ok(boa_engine::JsValue::undefined())
 }

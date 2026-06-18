@@ -3,13 +3,17 @@ use crate::{
     model::{Format, GenerateOptions, JapaneseLyricsType, ParseOptions, UfData},
     ConvertJapaneseLyricsOptions, IllegalFile,
 };
-use std::{cell::OnceCell, str::FromStr};
+use std::{
+    cell::{OnceCell, RefCell},
+    str::FromStr,
+};
 
 use anyhow::anyhow;
 use boa_engine::{
+    job::JobExecutor,
     js_string,
     object::builtins::{JsArray, JsTypedArray},
-    JsResult, JsString, JsValue, NativeFunction,
+    Context, JsResult, JsString, JsValue, NativeFunction,
 };
 use educe::Educe;
 use tracing::info;
@@ -146,7 +150,7 @@ async fn runner_entry_inner(
     let source = boa_engine::Source::from_bytes(include_str!("./utaformatix.js"));
     let queue = std::rc::Rc::new(crate::job_queue::TokioJobQueue::default());
     let mut context = boa_engine::Context::builder()
-        .job_queue(queue)
+        .job_executor(queue)
         .build()
         .unwrap();
 
@@ -175,37 +179,7 @@ async fn runner_entry_inner(
         .register_global_builtin_callable(
             js_string!("__host_log"),
             1,
-            NativeFunction::from_fn_ptr(|_this, args, _context| {
-                let level = args
-                    .first()
-                    .ok_or_else(|| {
-                        boa_engine::JsNativeError::error().with_message("Missing log level")
-                    })?
-                    .as_number()
-                    .ok_or_else(|| {
-                        boa_engine::JsNativeError::error().with_message("Invalid log level")
-                    })? as u8;
-                let message = args
-                    .get(1)
-                    .ok_or_else(|| {
-                        boa_engine::JsNativeError::error().with_message("Missing log message")
-                    })?
-                    .as_string()
-                    .ok_or_else(|| {
-                        boa_engine::JsNativeError::error().with_message("Invalid log message")
-                    })?
-                    .to_std_string()
-                    .map_err(|_| {
-                        boa_engine::JsNativeError::error().with_message("Invalid log message")
-                    })?;
-                match level {
-                    0 => info!("[JS] {}", message),
-                    1 => tracing::warn!("[JS] {}", message),
-                    2 => tracing::error!("[JS] {}", message),
-                    _ => tracing::warn!("[JS] {}", message),
-                }
-                Ok(boa_engine::JsValue::undefined())
-            }),
+            NativeFunction::from_fn_ptr(crate::js_impls::log),
         )
         .expect("Failed to register log function");
     context.eval(source).expect("Failed to evaluate script");
@@ -214,7 +188,7 @@ async fn runner_entry_inner(
         .global_object()
         .get(js_string!("utaformatix"), &mut context)
     {
-        Ok(boa_engine::JsValue::Object(val)) => val,
+        Ok(val) if val.is_object() => val.as_object().expect("Failed to get object").to_owned(),
         Ok(_) => panic!("Failed to initialize utaformatix: Unexpected return value"),
         Err(error) => {
             let value = error.to_opaque(&mut context);
@@ -401,6 +375,21 @@ fn wrap_error(
     Ok(result)
 }
 
+async fn run_jobs_async(context: &mut Context) -> JsResult<()> {
+    let executor = context
+        .downcast_job_executor::<crate::job_queue::TokioJobQueue>()
+        .expect("Failed to get TokioJobQueue");
+    let context = RefCell::new(context);
+    executor.run_jobs_async(&context).await
+}
+
+fn to_json(value: &JsValue, context: &mut Context) -> Result<serde_json::Value> {
+    value
+        .to_json(context)
+        .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?
+        .ok_or_else(|| anyhow!("Failed to convert to JSON: unsupported value").into())
+}
+
 async fn parse_single(
     utaformatix: &mut boa_engine::JsObject,
     context: &mut boa_engine::Context,
@@ -411,12 +400,12 @@ async fn parse_single(
     let data = boa_engine::object::builtins::JsUint8Array::from_iter(data, context)
         .map_err(|e| anyhow!("Failed to create Uint8Array: {:?}", e))?;
     let function_name = format!("parse{}", format.suffix());
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(JsString::from(function_name), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -434,27 +423,25 @@ async fn parse_single(
             context,
         )
         .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
-    let boa_engine::JsValue::Object(result_promise) = result_promise else {
-        panic!("Failed to call parse function: Unexpected return value");
-    };
+    let result_promise = result_promise
+        .as_object()
+        .expect("Failed to call parse function: Unexpected return value")
+        .to_owned();
     let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
         .expect("Failed to convert to JsPromise");
     let future = result_promise.into_js_future(context);
 
-    let runner = async { context.run_jobs_async().await };
+    let runner = run_jobs_async(context);
 
-    let (_, result) = tokio::join!(runner, future);
+    let (job_result, result) = tokio::join!(runner, future);
+    job_result.map_err(|e| anyhow!("Failed to run jobs: {:?}", e))?;
 
     let result = wrap_error(result, utaformatix, context)?;
     if !result.is_object() {
         return Err(anyhow!("Failed to parse: Unexpected return value: {:?}", result).into());
     }
-    Ok(serde_json::from_value(
-        result
-            .to_json(context)
-            .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
-    )
-    .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
+    Ok(serde_json::from_value(to_json(&result, context)?)
+        .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
 }
 
 async fn parse_multiple(
@@ -474,12 +461,12 @@ async fn parse_multiple(
         .collect::<Vec<JsValue>>();
 
     let function_name = format!("parse{}", format.suffix());
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(JsString::from(function_name), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -497,27 +484,25 @@ async fn parse_multiple(
             context,
         )
         .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
-    let boa_engine::JsValue::Object(result_promise) = result_promise else {
-        panic!("Failed to call parse function: Unexpected return value");
-    };
+    let result_promise = result_promise
+        .as_object()
+        .expect("Failed to call parse function: Unexpected return value")
+        .to_owned();
     let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
         .expect("Failed to convert to JsPromise");
     let future = result_promise.into_js_future(context);
 
-    let runner = async { context.run_jobs_async().await };
+    let runner = run_jobs_async(context);
 
-    let (_, result) = tokio::join!(runner, future);
+    let (job_result, result) = tokio::join!(runner, future);
+    job_result.map_err(|e| anyhow!("Failed to run jobs: {:?}", e))?;
 
     let result = wrap_error(result, utaformatix, context)?;
     if !result.is_object() {
         return Err(anyhow!("Failed to parse: Unexpected return value: {:?}", result).into());
     }
-    Ok(serde_json::from_value(
-        result
-            .to_json(context)
-            .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
-    )
-    .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
+    Ok(serde_json::from_value(to_json(&result, context)?)
+        .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
 }
 
 async fn generate_single(
@@ -528,12 +513,12 @@ async fn generate_single(
     options: GenerateOptions,
 ) -> Result<Vec<u8>> {
     let function_name = format!("generate{}", format.suffix());
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(JsString::from(function_name), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -555,16 +540,18 @@ async fn generate_single(
             context,
         )
         .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
-    let boa_engine::JsValue::Object(result_promise) = result_promise else {
-        panic!("Failed to call parse function: Unexpected return value");
-    };
+    let result_promise = result_promise
+        .as_object()
+        .expect("Failed to call parse function: Unexpected return value")
+        .to_owned();
     let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
         .expect("Failed to convert to JsPromise");
     let future = result_promise.into_js_future(context);
 
-    let runner = async { context.run_jobs_async().await };
+    let runner = run_jobs_async(context);
 
-    let (_, result) = tokio::join!(runner, future);
+    let (job_result, result) = tokio::join!(runner, future);
+    job_result.map_err(|e| anyhow!("Failed to run jobs: {:?}", e))?;
 
     let result = wrap_error(result, utaformatix, context)?
         .as_object()
@@ -589,12 +576,12 @@ async fn generate_multiple(
     options: GenerateOptions,
 ) -> Result<Vec<Vec<u8>>> {
     let function_name = format!("generate{}", format.suffix());
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(JsString::from(function_name), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -616,16 +603,18 @@ async fn generate_multiple(
             context,
         )
         .map_err(|e| anyhow!("Failed to call parse function: {:?}", e))?;
-    let boa_engine::JsValue::Object(result_promise) = result_promise else {
-        panic!("Failed to call parse function: Unexpected return value");
-    };
+    let result_promise = result_promise
+        .as_object()
+        .expect("Failed to call parse function: Unexpected return value")
+        .to_owned();
     let result_promise = boa_engine::object::builtins::JsPromise::from_object(result_promise)
         .expect("Failed to convert to JsPromise");
     let future = result_promise.into_js_future(context);
 
-    let runner = async { context.run_jobs_async().await };
+    let runner = run_jobs_async(context);
 
-    let (_, result) = tokio::join!(runner, future);
+    let (job_result, result) = tokio::join!(runner, future);
+    job_result.map_err(|e| anyhow!("Failed to run jobs: {:?}", e))?;
 
     let result = wrap_error(result, utaformatix, context)?
         .as_object()
@@ -660,12 +649,12 @@ fn analyze_japanese_lyrics_type(
     context: &mut boa_engine::Context,
     data: UfData,
 ) -> Result<Option<JapaneseLyricsType>> {
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(js_string!("analyzeJapaneseLyricsType"), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -696,12 +685,12 @@ fn convert_japanese_lyrics(
     to: JapaneseLyricsType,
     options: ConvertJapaneseLyricsOptions,
 ) -> Result<UfData> {
-    let boa_engine::JsValue::Object(parser) = utaformatix
+    let parser = utaformatix
         .get(js_string!("convertJapaneseLyrics"), context)
         .expect("Failed to get parse function")
-    else {
-        panic!("Failed to get parse function: Unexpected return value");
-    };
+        .as_object()
+        .expect("Failed to get parse function: Unexpected return value")
+        .to_owned();
     if !parser.is_callable() {
         panic!("Failed to get parse function: Unexpected return value");
     }
@@ -725,10 +714,6 @@ fn convert_japanese_lyrics(
     );
     let result = wrap_error(result, utaformatix, context)?;
 
-    Ok(serde_json::from_value(
-        result
-            .to_json(context)
-            .map_err(|e| anyhow!("Failed to convert to JSON: {:?}", e))?,
-    )
-    .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
+    Ok(serde_json::from_value(to_json(&result, context)?)
+        .map_err(|e| anyhow!("Failed to parse JSON: {:?}", e))?)
 }

@@ -1,70 +1,164 @@
 #![allow(clippy::await_holding_refcell_ref)]
 use boa_engine::{
-    job::{FutureJob, JobQueue, NativeJob},
-    Context,
+    job::{GenericJob, Job, JobExecutor, NativeAsyncJob, PromiseJob, TimeoutJob},
+    Context, JsResult,
+};
+use std::{
+    cell::RefCell,
+    collections::{BTreeMap, VecDeque},
+    mem,
+    rc::Rc,
 };
 use tracing::{info, warn};
 
 pub(crate) struct TokioJobQueue {
-    jobs: std::cell::RefCell<std::collections::VecDeque<NativeJob>>,
-    futures: std::cell::RefCell<std::collections::VecDeque<FutureJob>>,
+    promise_jobs: RefCell<VecDeque<PromiseJob>>,
+    async_jobs: RefCell<VecDeque<NativeAsyncJob>>,
+    generic_jobs: RefCell<VecDeque<GenericJob>>,
+    timeout_jobs: RefCell<BTreeMap<boa_engine::context::time::JsInstant, TimeoutJob>>,
 }
 
 impl Default for TokioJobQueue {
     fn default() -> Self {
         Self {
-            jobs: std::cell::RefCell::new(std::collections::VecDeque::new()),
-            futures: std::cell::RefCell::new(std::collections::VecDeque::new()),
+            promise_jobs: RefCell::new(VecDeque::new()),
+            async_jobs: RefCell::new(VecDeque::new()),
+            generic_jobs: RefCell::new(VecDeque::new()),
+            timeout_jobs: RefCell::new(BTreeMap::new()),
         }
     }
 }
 
-// https://zenn.dev/itte/articles/5c8e5c191e386b#%E3%82%B8%E3%83%A7%E3%83%96%E3%82%AD%E3%83%A5%E3%83%BC%E3%82%92%E5%AE%9F%E8%A3%85%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B
-impl JobQueue for TokioJobQueue {
-    fn enqueue_promise_job(&self, job: NativeJob, _context: &mut Context) {
-        self.jobs.borrow_mut().push_back(job);
+impl TokioJobQueue {
+    fn is_idle(&self, context: &Context) -> bool {
+        self.promise_jobs.borrow().is_empty()
+            && self.async_jobs.borrow().is_empty()
+            && self.generic_jobs.borrow().is_empty()
+            && self.has_no_timeout_jobs_to_run(context)
     }
 
-    fn enqueue_future_job(&self, future: FutureJob, _context: &mut Context) {
-        self.futures.borrow_mut().push_back(future);
+    fn clear(&self) {
+        self.promise_jobs.borrow_mut().clear();
+        self.async_jobs.borrow_mut().clear();
+        self.generic_jobs.borrow_mut().clear();
+        self.timeout_jobs.borrow_mut().clear();
     }
 
-    fn run_jobs(&self, context: &mut Context) {
-        let mut next_job = self.jobs.borrow_mut().pop_front();
-        while let Some(job) = next_job {
-            if job.call(context).is_err() {
-                self.jobs.borrow_mut().clear();
-                warn!("Error occurred while running job, clearing job queue");
-                return;
-            };
-            next_job = self.jobs.borrow_mut().pop_front();
+    fn has_no_timeout_jobs_to_run(&self, context: &Context) -> bool {
+        let now = context.clock().now();
+        !self
+            .timeout_jobs
+            .borrow()
+            .iter()
+            .any(|(time, _)| &now >= time)
+    }
+}
+
+impl JobExecutor for TokioJobQueue {
+    fn enqueue_job(self: Rc<Self>, job: Job, _context: &mut Context) {
+        match job {
+            Job::PromiseJob(job) => self.promise_jobs.borrow_mut().push_back(job),
+            Job::AsyncJob(job) => self.async_jobs.borrow_mut().push_back(job),
+            Job::GenericJob(job) => self.generic_jobs.borrow_mut().push_back(job),
+            Job::TimeoutJob(job) => {
+                let now = _context.clock().now();
+                self.timeout_jobs
+                    .borrow_mut()
+                    .insert(now + job.timeout(), job);
+            }
+            _ => warn!("Unsupported job type queued"),
         }
     }
 
-    fn run_jobs_async<'a, 'ctx, 'fut>(
-        &'a self,
-        context: &'ctx mut Context,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + 'fut>>
-    where
-        'a: 'fut,
-        'ctx: 'fut,
-    {
-        Box::pin(async {
-            let local = tokio::task::LocalSet::new();
-            info!("Running jobs async");
-            local
-                .run_until(async {
-                    while !(self.jobs.borrow().is_empty() && self.futures.borrow().is_empty()) {
-                        context.run_jobs();
+    fn run_jobs(self: Rc<Self>, context: &mut Context) -> JsResult<()> {
+        loop {
+            let job = { self.promise_jobs.borrow_mut().pop_front() };
+            let Some(job) = job else {
+                break;
+            };
+            job.call(context)?;
+        }
 
-                        if let Some(res) = self.futures.borrow_mut().pop_front() {
-                            let handle = res.await;
-                            context.enqueue_job(handle)
-                        }
+        loop {
+            let job = { self.generic_jobs.borrow_mut().pop_front() };
+            let Some(job) = job else {
+                break;
+            };
+            job.call(context)?;
+        }
+
+        Ok(())
+    }
+
+    async fn run_jobs_async(self: Rc<Self>, context: &RefCell<&mut Context>) -> JsResult<()>
+    where
+        Self: Sized,
+    {
+        info!("Running jobs async");
+
+        while !self.is_idle(&context.borrow()) {
+            loop {
+                let job = { self.promise_jobs.borrow_mut().pop_front() };
+                let Some(job) = job else {
+                    break;
+                };
+
+                if let Err(error) = job.call(&mut context.borrow_mut()) {
+                    self.clear();
+                    warn!("Error occurred while running promise job, clearing job queue");
+                    return Err(error);
+                }
+            }
+
+            loop {
+                let job = { self.generic_jobs.borrow_mut().pop_front() };
+                let Some(job) = job else {
+                    break;
+                };
+
+                if let Err(error) = job.call(&mut context.borrow_mut()) {
+                    self.clear();
+                    warn!("Error occurred while running generic job, clearing job queue");
+                    return Err(error);
+                }
+            }
+
+            let async_job = { self.async_jobs.borrow_mut().pop_front() };
+            if let Some(job) = async_job {
+                if let Err(error) = job.call(context).await {
+                    self.clear();
+                    warn!("Error occurred while running async job, clearing job queue");
+                    return Err(error);
+                }
+                continue;
+            }
+
+            if self.has_no_timeout_jobs_to_run(&context.borrow()) {
+                break;
+            }
+
+            {
+                let now = context.borrow().clock().now();
+                let mut timeout_jobs = self.timeout_jobs.borrow_mut();
+                let mut jobs_to_keep = timeout_jobs.split_off(&now);
+                jobs_to_keep.retain(|_, job| !job.is_cancelled());
+                let jobs_to_run = mem::replace(&mut *timeout_jobs, jobs_to_keep);
+                drop(timeout_jobs);
+
+                for job in jobs_to_run.into_values() {
+                    if let Err(error) = job.call(&mut context.borrow_mut()) {
+                        self.clear();
+                        warn!("Error occurred while running timeout job, clearing job queue");
+                        return Err(error);
                     }
-                })
-                .await;
-            info!("Finished running jobs async");
-        })
+                }
+            }
+
+            context.borrow_mut().clear_kept_objects();
+            tokio::task::yield_now().await;
+        }
+
+        info!("Finished running jobs async");
+        Ok(())
     }
 }
