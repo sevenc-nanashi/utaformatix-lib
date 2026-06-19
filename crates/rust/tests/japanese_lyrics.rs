@@ -10,7 +10,7 @@ fn utaformatix_instance() -> utaformatix::base::UtaFormatix {
 #[tokio::test]
 #[traced_test]
 async fn analyze_japanese_lyrics_type(utaformatix_instance: utaformatix::base::UtaFormatix) {
-    let data = include_bytes!("../utaformatix-ts/testAssets/tsukuyomi_vcv.ust");
+    let data = include_bytes!("./assets/tsukuyomi_vcv.ust");
     let options = ParseOptions::default();
     let result = utaformatix_instance.parse_ust(&[data], options).await;
 
@@ -28,7 +28,7 @@ async fn analyze_japanese_lyrics_type(utaformatix_instance: utaformatix::base::U
 #[tokio::test]
 #[traced_test]
 async fn convert_japanese_lyrics(utaformatix_instance: utaformatix::base::UtaFormatix) {
-    let data = include_bytes!("../utaformatix-ts/testAssets/tsukuyomi_vcv.ust");
+    let data = include_bytes!("./assets/tsukuyomi_vcv.ust");
     let options = ParseOptions::default();
     let result = utaformatix_instance.parse_ust(&[data], options).await;
 

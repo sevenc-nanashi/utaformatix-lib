@@ -1,0 +1,1841 @@
+{
+  "formatVersion": 1,
+  "project": {
+    "name": "expla1n_self",
+    "tracks": [
+      {
+        "name": "Track1",
+        "notes": [
+          {
+            "key": 60,
+            "tickOn": 1440,
+            "tickOff": 1680,
+            "lyric": "か"
+          },
+          {
+            "key": 62,
+            "tickOn": 1680,
+            "tickOff": 1920,
+            "lyric": "り"
+          },
+          {
+            "key": 64,
+            "tickOn": 1920,
+            "tickOff": 2400,
+            "lyric": "も"
+          },
+          {
+            "key": 72,
+            "tickOn": 2400,
+            "tickOff": 2640,
+            "lyric": "の"
+          },
+          {
+            "key": 69,
+            "tickOn": 2640,
+            "tickOff": 2880,
+            "lyric": "の"
+          },
+          {
+            "key": 67,
+            "tickOn": 2880,
+            "tickOff": 3360,
+            "lyric": "こ"
+          },
+          {
+            "key": 69,
+            "tickOn": 3360,
+            "tickOff": 3600,
+            "lyric": "え"
+          },
+          {
+            "key": 67,
+            "tickOn": 3600,
+            "tickOff": 3840,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 3840,
+            "tickOff": 4080,
+            "lyric": "う"
+          },
+          {
+            "key": 69,
+            "tickOn": 4080,
+            "tickOff": 4320,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 4320,
+            "tickOff": 4560,
+            "lyric": "あ"
+          },
+          {
+            "key": 62,
+            "tickOn": 4560,
+            "tickOff": 4800,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 4800,
+            "tickOff": 5220,
+            "lyric": "せ"
+          },
+          {
+            "key": 60,
+            "tickOn": 5280,
+            "tickOff": 5520,
+            "lyric": "ひ"
+          },
+          {
+            "key": 62,
+            "tickOn": 5520,
+            "tickOff": 5760,
+            "lyric": "ろ"
+          },
+          {
+            "key": 64,
+            "tickOn": 5760,
+            "tickOff": 6120,
+            "lyric": "お"
+          },
+          {
+            "key": 64,
+            "tickOn": 6120,
+            "tickOff": 6240,
+            "lyric": ""
+          },
+          {
+            "key": 69,
+            "tickOn": 6240,
+            "tickOff": 6600,
+            "lyric": "た"
+          },
+          {
+            "key": 68,
+            "tickOn": 6600,
+            "tickOff": 6720,
+            "lyric": "あ"
+          },
+          {
+            "key": 67,
+            "tickOn": 6720,
+            "tickOff": 7200,
+            "lyric": "こ"
+          },
+          {
+            "key": 69,
+            "tickOn": 7200,
+            "tickOff": 7440,
+            "lyric": "ど"
+          },
+          {
+            "key": 69,
+            "tickOn": 7440,
+            "tickOff": 7680,
+            "lyric": "な"
+          },
+          {
+            "key": 72,
+            "tickOn": 7680,
+            "tickOff": 7920,
+            "lyric": "ら"
+          },
+          {
+            "key": 74,
+            "tickOn": 7920,
+            "tickOff": 8160,
+            "lyric": "し"
+          },
+          {
+            "key": 72,
+            "tickOn": 8160,
+            "tickOff": 8400,
+            "lyric": "な"
+          },
+          {
+            "key": 67,
+            "tickOn": 8400,
+            "tickOff": 8640,
+            "lyric": "が"
+          },
+          {
+            "key": 69,
+            "tickOn": 8640,
+            "tickOff": 9360,
+            "lyric": "ら"
+          },
+          {
+            "key": 67,
+            "tickOn": 9600,
+            "tickOff": 9840,
+            "lyric": "こ"
+          },
+          {
+            "key": 67,
+            "tickOn": 9840,
+            "tickOff": 10080,
+            "lyric": "と"
+          },
+          {
+            "key": 69,
+            "tickOn": 10080,
+            "tickOff": 10320,
+            "lyric": "ば"
+          },
+          {
+            "key": 67,
+            "tickOn": 10320,
+            "tickOff": 10560,
+            "lyric": "を"
+          },
+          {
+            "key": 67,
+            "tickOn": 10560,
+            "tickOff": 10800,
+            "lyric": "つ"
+          },
+          {
+            "key": 69,
+            "tickOn": 10800,
+            "tickOff": 11040,
+            "lyric": "む"
+          },
+          {
+            "key": 67,
+            "tickOn": 11040,
+            "tickOff": 11280,
+            "lyric": "い"
+          },
+          {
+            "key": 67,
+            "tickOn": 11280,
+            "tickOff": 11520,
+            "lyric": "で"
+          },
+          {
+            "key": 67,
+            "tickOn": 11520,
+            "tickOff": 11760,
+            "lyric": "う"
+          },
+          {
+            "key": 72,
+            "tickOn": 11760,
+            "tickOff": 12000,
+            "lyric": "ち"
+          },
+          {
+            "key": 69,
+            "tickOn": 12000,
+            "tickOff": 12240,
+            "lyric": "こ"
+          },
+          {
+            "key": 67,
+            "tickOn": 12240,
+            "tickOff": 12480,
+            "lyric": "ん"
+          },
+          {
+            "key": 69,
+            "tickOn": 12480,
+            "tickOff": 12720,
+            "lyric": "で"
+          },
+          {
+            "key": 64,
+            "tickOn": 12960,
+            "tickOff": 13200,
+            "lyric": "わ"
+          },
+          {
+            "key": 67,
+            "tickOn": 13200,
+            "tickOff": 13440,
+            "lyric": "た"
+          },
+          {
+            "key": 69,
+            "tickOn": 13440,
+            "tickOff": 13800,
+            "lyric": "し"
+          },
+          {
+            "key": 70,
+            "tickOn": 13800,
+            "tickOff": 13920,
+            "lyric": "い"
+          },
+          {
+            "key": 67,
+            "tickOn": 13920,
+            "tickOff": 14160,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 14160,
+            "tickOff": 14400,
+            "lyric": "う"
+          },
+          {
+            "key": 64,
+            "tickOn": 14400,
+            "tickOff": 14640,
+            "lyric": "た"
+          },
+          {
+            "key": 62,
+            "tickOn": 14640,
+            "tickOff": 14880,
+            "lyric": "を"
+          },
+          {
+            "key": 62,
+            "tickOn": 14880,
+            "tickOff": 15120,
+            "lyric": "う"
+          },
+          {
+            "key": 64,
+            "tickOn": 15120,
+            "tickOff": 15360,
+            "lyric": "た"
+          },
+          {
+            "key": 62,
+            "tickOn": 15360,
+            "tickOff": 16320,
+            "lyric": "う"
+          },
+          {
+            "key": 60,
+            "tickOn": 16320,
+            "tickOff": 16740,
+            "lyric": "う"
+          },
+          {
+            "key": 60,
+            "tickOn": 16800,
+            "tickOff": 17040,
+            "lyric": "か"
+          },
+          {
+            "key": 62,
+            "tickOn": 17040,
+            "tickOff": 17280,
+            "lyric": "り"
+          },
+          {
+            "key": 64,
+            "tickOn": 17280,
+            "tickOff": 17760,
+            "lyric": "も"
+          },
+          {
+            "key": 72,
+            "tickOn": 17760,
+            "tickOff": 18000,
+            "lyric": "の"
+          },
+          {
+            "key": 69,
+            "tickOn": 18000,
+            "tickOff": 18240,
+            "lyric": "で"
+          },
+          {
+            "key": 67,
+            "tickOn": 18240,
+            "tickOff": 18720,
+            "lyric": "う"
+          },
+          {
+            "key": 69,
+            "tickOn": 18720,
+            "tickOff": 18960,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 18960,
+            "tickOff": 19200,
+            "lyric": "を"
+          },
+          {
+            "key": 67,
+            "tickOn": 19200,
+            "tickOff": 19440,
+            "lyric": "く"
+          },
+          {
+            "key": 69,
+            "tickOn": 19440,
+            "tickOff": 19680,
+            "lyric": "み"
+          },
+          {
+            "key": 67,
+            "tickOn": 19680,
+            "tickOff": 19920,
+            "lyric": "な"
+          },
+          {
+            "key": 64,
+            "tickOn": 19920,
+            "tickOff": 20160,
+            "lyric": "が"
+          },
+          {
+            "key": 62,
+            "tickOn": 20160,
+            "tickOff": 20580,
+            "lyric": "ら"
+          },
+          {
+            "key": 60,
+            "tickOn": 20640,
+            "tickOff": 20880,
+            "lyric": "わ"
+          },
+          {
+            "key": 62,
+            "tickOn": 20880,
+            "tickOff": 21120,
+            "lyric": "た"
+          },
+          {
+            "key": 64,
+            "tickOn": 21120,
+            "tickOff": 21600,
+            "lyric": "し"
+          },
+          {
+            "key": 69,
+            "tickOn": 21600,
+            "tickOff": 22080,
+            "lyric": "わ"
+          },
+          {
+            "key": 67,
+            "tickOn": 22080,
+            "tickOff": 22320,
+            "lyric": "う"
+          },
+          {
+            "key": 67,
+            "tickOn": 22320,
+            "tickOff": 22560,
+            "lyric": "た"
+          },
+          {
+            "key": 69,
+            "tickOn": 22560,
+            "tickOff": 22800,
+            "lyric": "を"
+          },
+          {
+            "key": 72,
+            "tickOn": 22800,
+            "tickOff": 23040,
+            "lyric": "う"
+          },
+          {
+            "key": 74,
+            "tickOn": 23040,
+            "tickOff": 23280,
+            "lyric": "た"
+          },
+          {
+            "key": 76,
+            "tickOn": 23280,
+            "tickOff": 23520,
+            "lyric": "あ"
+          },
+          {
+            "key": 72,
+            "tickOn": 23520,
+            "tickOff": 23760,
+            "lyric": "て"
+          },
+          {
+            "key": 67,
+            "tickOn": 23760,
+            "tickOff": 24000,
+            "lyric": "い"
+          },
+          {
+            "key": 69,
+            "tickOn": 24000,
+            "tickOff": 24420,
+            "lyric": "る"
+          },
+          {
+            "key": 64,
+            "tickOn": 24480,
+            "tickOff": 24720,
+            "lyric": "メ"
+          },
+          {
+            "key": 67,
+            "tickOn": 24720,
+            "tickOff": 24960,
+            "lyric": "ろ"
+          },
+          {
+            "key": 69,
+            "tickOn": 24960,
+            "tickOff": 25440,
+            "lyric": "ディ"
+          },
+          {
+            "key": 64,
+            "tickOn": 25440,
+            "tickOff": 25680,
+            "lyric": "も"
+          },
+          {
+            "key": 67,
+            "tickOn": 25680,
+            "tickOff": 25920,
+            "lyric": "か"
+          },
+          {
+            "key": 69,
+            "tickOn": 25920,
+            "tickOff": 26400,
+            "lyric": "し"
+          },
+          {
+            "key": 64,
+            "tickOn": 26400,
+            "tickOff": 26640,
+            "lyric": "も"
+          },
+          {
+            "key": 67,
+            "tickOn": 26640,
+            "tickOff": 26880,
+            "lyric": "な"
+          },
+          {
+            "key": 67,
+            "tickOn": 26880,
+            "tickOff": 27120,
+            "lyric": "に"
+          },
+          {
+            "key": 69,
+            "tickOn": 27120,
+            "tickOff": 27360,
+            "lyric": "も"
+          },
+          {
+            "key": 67,
+            "tickOn": 27360,
+            "tickOff": 27600,
+            "lyric": "し"
+          },
+          {
+            "key": 72,
+            "tickOn": 27600,
+            "tickOff": 27840,
+            "lyric": "ら"
+          },
+          {
+            "key": 69,
+            "tickOn": 27840,
+            "tickOff": 28260,
+            "lyric": "ず"
+          },
+          {
+            "key": 64,
+            "tickOn": 28320,
+            "tickOff": 28560,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 28560,
+            "tickOff": 28800,
+            "lyric": "だ"
+          },
+          {
+            "key": 69,
+            "tickOn": 28800,
+            "tickOff": 29040,
+            "lyric": "け"
+          },
+          {
+            "key": 67,
+            "tickOn": 29040,
+            "tickOff": 29280,
+            "lyric": "え"
+          },
+          {
+            "key": 67,
+            "tickOn": 29280,
+            "tickOff": 29520,
+            "lyric": "き"
+          },
+          {
+            "key": 64,
+            "tickOn": 29520,
+            "tickOff": 29760,
+            "lyric": "を"
+          },
+          {
+            "key": 64,
+            "tickOn": 29760,
+            "tickOff": 30000,
+            "lyric": "さ"
+          },
+          {
+            "key": 62,
+            "tickOn": 30000,
+            "tickOff": 30240,
+            "lyric": "わ"
+          },
+          {
+            "key": 62,
+            "tickOn": 30240,
+            "tickOff": 30480,
+            "lyric": "り"
+          },
+          {
+            "key": 62,
+            "tickOn": 30480,
+            "tickOff": 30720,
+            "lyric": "あ"
+          },
+          {
+            "key": 64,
+            "tickOn": 30720,
+            "tickOff": 30960,
+            "lyric": "そ"
+          },
+          {
+            "key": 67,
+            "tickOn": 30960,
+            "tickOff": 31200,
+            "lyric": "ん"
+          },
+          {
+            "key": 64,
+            "tickOn": 31200,
+            "tickOff": 31440,
+            "lyric": "で"
+          },
+          {
+            "key": 62,
+            "tickOn": 31440,
+            "tickOff": 31680,
+            "lyric": "い"
+          },
+          {
+            "key": 60,
+            "tickOn": 31680,
+            "tickOff": 32040,
+            "lyric": "る"
+          },
+          {
+            "key": 60,
+            "tickOn": 47520,
+            "tickOff": 47760,
+            "lyric": "め"
+          },
+          {
+            "key": 62,
+            "tickOn": 47760,
+            "tickOff": 48000,
+            "lyric": "ろ"
+          },
+          {
+            "key": 64,
+            "tickOn": 48000,
+            "tickOff": 48960,
+            "lyric": "でぃ"
+          },
+          {
+            "key": 72,
+            "tickOn": 48960,
+            "tickOff": 49440,
+            "lyric": "い"
+          },
+          {
+            "key": 69,
+            "tickOn": 49440,
+            "tickOff": 49920,
+            "lyric": "を"
+          },
+          {
+            "key": 67,
+            "tickOn": 49920,
+            "tickOff": 50160,
+            "lyric": "う"
+          },
+          {
+            "key": 69,
+            "tickOn": 50160,
+            "tickOff": 50400,
+            "lyric": "ち"
+          },
+          {
+            "key": 67,
+            "tickOn": 50400,
+            "tickOff": 50640,
+            "lyric": "こ"
+          },
+          {
+            "key": 64,
+            "tickOn": 50640,
+            "tickOff": 50880,
+            "lyric": "ん"
+          },
+          {
+            "key": 69,
+            "tickOn": 50880,
+            "tickOff": 51120,
+            "lyric": "で"
+          },
+          {
+            "key": 67,
+            "tickOn": 51360,
+            "tickOff": 51600,
+            "lyric": "せ"
+          },
+          {
+            "key": 64,
+            "tickOn": 51600,
+            "tickOff": 51840,
+            "lyric": "ん"
+          },
+          {
+            "key": 60,
+            "tickOn": 51840,
+            "tickOff": 52800,
+            "lyric": "り"
+          },
+          {
+            "key": 72,
+            "tickOn": 52800,
+            "tickOff": 53280,
+            "lyric": "つ"
+          },
+          {
+            "key": 69,
+            "tickOn": 53280,
+            "tickOff": 53520,
+            "lyric": "を"
+          },
+          {
+            "key": 69,
+            "tickOn": 53520,
+            "tickOff": 53760,
+            "lyric": "く"
+          },
+          {
+            "key": 67,
+            "tickOn": 53760,
+            "tickOff": 54000,
+            "lyric": "み"
+          },
+          {
+            "key": 69,
+            "tickOn": 54000,
+            "tickOff": 54240,
+            "lyric": "あ"
+          },
+          {
+            "key": 67,
+            "tickOn": 54240,
+            "tickOff": 54480,
+            "lyric": "げ"
+          },
+          {
+            "key": 64,
+            "tickOn": 54480,
+            "tickOff": 54720,
+            "lyric": "て"
+          },
+          {
+            "key": 60,
+            "tickOn": 54720,
+            "tickOff": 55080,
+            "lyric": "た"
+          },
+          {
+            "key": 60,
+            "tickOn": 55200,
+            "tickOff": 55440,
+            "lyric": "き"
+          },
+          {
+            "key": 62,
+            "tickOn": 55440,
+            "tickOff": 55680,
+            "lyric": "そ"
+          },
+          {
+            "key": 64,
+            "tickOn": 55680,
+            "tickOff": 56640,
+            "lyric": "く"
+          },
+          {
+            "key": 72,
+            "tickOn": 56640,
+            "tickOff": 57120,
+            "lyric": "う"
+          },
+          {
+            "key": 69,
+            "tickOn": 57120,
+            "tickOff": 57600,
+            "lyric": "も"
+          },
+          {
+            "key": 67,
+            "tickOn": 57600,
+            "tickOff": 57840,
+            "lyric": "き"
+          },
+          {
+            "key": 69,
+            "tickOn": 57840,
+            "tickOff": 58080,
+            "lyric": "ん"
+          },
+          {
+            "key": 67,
+            "tickOn": 58080,
+            "tickOff": 58320,
+            "lyric": "そ"
+          },
+          {
+            "key": 64,
+            "tickOn": 58320,
+            "tickOff": 58560,
+            "lyric": "く"
+          },
+          {
+            "key": 69,
+            "tickOn": 58560,
+            "tickOff": 58800,
+            "lyric": "も"
+          },
+          {
+            "key": 69,
+            "tickOn": 58800,
+            "tickOff": 59040,
+            "lyric": ""
+          },
+          {
+            "key": 67,
+            "tickOn": 59040,
+            "tickOff": 59280,
+            "lyric": "し"
+          },
+          {
+            "key": 64,
+            "tickOn": 59280,
+            "tickOff": 59520,
+            "lyric": "ら"
+          },
+          {
+            "key": 60,
+            "tickOn": 59520,
+            "tickOff": 60480,
+            "lyric": "ぬ"
+          },
+          {
+            "key": 72,
+            "tickOn": 60480,
+            "tickOff": 60960,
+            "lyric": "ま"
+          },
+          {
+            "key": 69,
+            "tickOn": 60960,
+            "tickOff": 61440,
+            "lyric": "ま"
+          },
+          {
+            "key": 67,
+            "tickOn": 61440,
+            "tickOff": 61680,
+            "lyric": "か"
+          },
+          {
+            "key": 69,
+            "tickOn": 61680,
+            "tickOff": 61920,
+            "lyric": "な"
+          },
+          {
+            "key": 67,
+            "tickOn": 61920,
+            "tickOff": 62160,
+            "lyric": "で"
+          },
+          {
+            "key": 64,
+            "tickOn": 62160,
+            "tickOff": 62400,
+            "lyric": "て"
+          },
+          {
+            "key": 60,
+            "tickOn": 62400,
+            "tickOff": 62640,
+            "lyric": "た"
+          },
+          {
+            "key": 62,
+            "tickOn": 62880,
+            "tickOff": 63120,
+            "lyric": "た"
+          },
+          {
+            "key": 64,
+            "tickOn": 63120,
+            "tickOff": 63360,
+            "lyric": "す"
+          },
+          {
+            "key": 67,
+            "tickOn": 63360,
+            "tickOff": 64320,
+            "lyric": "け"
+          },
+          {
+            "key": 69,
+            "tickOn": 64320,
+            "tickOff": 64800,
+            "lyric": "を"
+          },
+          {
+            "key": 64,
+            "tickOn": 64800,
+            "tickOff": 65040,
+            "lyric": "か"
+          },
+          {
+            "key": 67,
+            "tickOn": 65040,
+            "tickOff": 65280,
+            "lyric": "り"
+          },
+          {
+            "key": 69,
+            "tickOn": 65280,
+            "tickOff": 66480,
+            "lyric": "て"
+          },
+          {
+            "key": 64,
+            "tickOn": 66720,
+            "tickOff": 66960,
+            "lyric": "お"
+          },
+          {
+            "key": 67,
+            "tickOn": 66960,
+            "tickOff": 67200,
+            "lyric": "と"
+          },
+          {
+            "key": 69,
+            "tickOn": 67200,
+            "tickOff": 68160,
+            "lyric": "を"
+          },
+          {
+            "key": 72,
+            "tickOn": 68160,
+            "tickOff": 68640,
+            "lyric": "か"
+          },
+          {
+            "key": 69,
+            "tickOn": 68640,
+            "tickOff": 68880,
+            "lyric": "え"
+          },
+          {
+            "key": 67,
+            "tickOn": 68880,
+            "tickOff": 70320,
+            "lyric": "て"
+          },
+          {
+            "key": 62,
+            "tickOn": 70560,
+            "tickOff": 70800,
+            "lyric": "きょ"
+          },
+          {
+            "key": 64,
+            "tickOn": 70800,
+            "tickOff": 71040,
+            "lyric": "く"
+          },
+          {
+            "key": 67,
+            "tickOn": 71040,
+            "tickOff": 72360,
+            "lyric": "を"
+          },
+          {
+            "key": 62,
+            "tickOn": 72480,
+            "tickOff": 72720,
+            "lyric": "い"
+          },
+          {
+            "key": 64,
+            "tickOn": 72720,
+            "tickOff": 72960,
+            "lyric": "ろ"
+          },
+          {
+            "key": 67,
+            "tickOn": 72960,
+            "tickOff": 73920,
+            "lyric": "ど"
+          },
+          {
+            "key": 69,
+            "tickOn": 73920,
+            "tickOff": 74160,
+            "lyric": "お"
+          },
+          {
+            "key": 69,
+            "tickOn": 74160,
+            "tickOff": 74400,
+            "lyric": ""
+          },
+          {
+            "key": 62,
+            "tickOn": 74400,
+            "tickOff": 74640,
+            "lyric": "て"
+          },
+          {
+            "key": 64,
+            "tickOn": 74640,
+            "tickOff": 74880,
+            "lyric": "ゆ"
+          },
+          {
+            "key": 67,
+            "tickOn": 74880,
+            "tickOff": 76800,
+            "lyric": "く"
+          },
+          {
+            "key": 62,
+            "tickOn": 76800,
+            "tickOff": 77760,
+            "lyric": "う"
+          },
+          {
+            "key": 60,
+            "tickOn": 77760,
+            "tickOff": 78000,
+            "lyric": "う"
+          },
+          {
+            "key": 62,
+            "tickOn": 78240,
+            "tickOff": 78480,
+            "lyric": "な"
+          },
+          {
+            "key": 64,
+            "tickOn": 78480,
+            "tickOff": 78720,
+            "lyric": "ら"
+          },
+          {
+            "key": 67,
+            "tickOn": 78720,
+            "tickOff": 79680,
+            "lyric": "ん"
+          },
+          {
+            "key": 69,
+            "tickOn": 79680,
+            "tickOff": 79920,
+            "lyric": "だ"
+          },
+          {
+            "key": 64,
+            "tickOn": 79920,
+            "tickOff": 80160,
+            "lyric": "と"
+          },
+          {
+            "key": 62,
+            "tickOn": 80160,
+            "tickOff": 80400,
+            "lyric": "ら"
+          },
+          {
+            "key": 64,
+            "tickOn": 80400,
+            "tickOff": 80640,
+            "lyric": "あ"
+          },
+          {
+            "key": 67,
+            "tickOn": 80640,
+            "tickOff": 81840,
+            "lyric": "く"
+          },
+          {
+            "key": 62,
+            "tickOn": 82080,
+            "tickOff": 82320,
+            "lyric": "な"
+          },
+          {
+            "key": 64,
+            "tickOn": 82320,
+            "tickOff": 82560,
+            "lyric": "が"
+          },
+          {
+            "key": 67,
+            "tickOn": 82560,
+            "tickOff": 83520,
+            "lyric": "し"
+          },
+          {
+            "key": 72,
+            "tickOn": 83520,
+            "tickOff": 84000,
+            "lyric": "な"
+          },
+          {
+            "key": 69,
+            "tickOn": 84000,
+            "tickOff": 84240,
+            "lyric": "が"
+          },
+          {
+            "key": 67,
+            "tickOn": 84240,
+            "tickOff": 85440,
+            "lyric": "ら"
+          },
+          {
+            "key": 65,
+            "tickOn": 85440,
+            "tickOff": 85860,
+            "lyric": "あ"
+          },
+          {
+            "key": 62,
+            "tickOn": 85920,
+            "tickOff": 86160,
+            "lyric": "う"
+          },
+          {
+            "key": 64,
+            "tickOn": 86160,
+            "tickOff": 86400,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 86400,
+            "tickOff": 87840,
+            "lyric": "を"
+          },
+          {
+            "key": 64,
+            "tickOn": 87840,
+            "tickOff": 88080,
+            "lyric": "く"
+          },
+          {
+            "key": 62,
+            "tickOn": 88080,
+            "tickOff": 88320,
+            "lyric": "み"
+          },
+          {
+            "key": 62,
+            "tickOn": 88320,
+            "tickOff": 89760,
+            "lyric": "あ"
+          },
+          {
+            "key": 64,
+            "tickOn": 89760,
+            "tickOff": 90000,
+            "lyric": "げ"
+          },
+          {
+            "key": 60,
+            "tickOn": 90000,
+            "tickOff": 92160,
+            "lyric": "る"
+          },
+          {
+            "key": 60,
+            "tickOn": 93600,
+            "tickOff": 93840,
+            "lyric": "か"
+          },
+          {
+            "key": 62,
+            "tickOn": 93840,
+            "tickOff": 94080,
+            "lyric": "り"
+          },
+          {
+            "key": 64,
+            "tickOn": 94080,
+            "tickOff": 94560,
+            "lyric": "も"
+          },
+          {
+            "key": 72,
+            "tickOn": 94560,
+            "tickOff": 94800,
+            "lyric": "の"
+          },
+          {
+            "key": 69,
+            "tickOn": 94800,
+            "tickOff": 95040,
+            "lyric": "の"
+          },
+          {
+            "key": 67,
+            "tickOn": 95040,
+            "tickOff": 95520,
+            "lyric": "こ"
+          },
+          {
+            "key": 69,
+            "tickOn": 95520,
+            "tickOff": 95760,
+            "lyric": "え"
+          },
+          {
+            "key": 67,
+            "tickOn": 95760,
+            "tickOff": 96000,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 96000,
+            "tickOff": 96240,
+            "lyric": "お"
+          },
+          {
+            "key": 69,
+            "tickOn": 96240,
+            "tickOff": 96480,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 96480,
+            "tickOff": 96720,
+            "lyric": "あ"
+          },
+          {
+            "key": 64,
+            "tickOn": 96720,
+            "tickOff": 96960,
+            "lyric": "わ"
+          },
+          {
+            "key": 62,
+            "tickOn": 96960,
+            "tickOff": 97380,
+            "lyric": "せ"
+          },
+          {
+            "key": 60,
+            "tickOn": 97440,
+            "tickOff": 97680,
+            "lyric": "ひ"
+          },
+          {
+            "key": 62,
+            "tickOn": 97680,
+            "tickOff": 97920,
+            "lyric": "ろ"
+          },
+          {
+            "key": 64,
+            "tickOn": 97920,
+            "tickOff": 98280,
+            "lyric": "お"
+          },
+          {
+            "key": 64,
+            "tickOn": 98280,
+            "tickOff": 98400,
+            "lyric": ""
+          },
+          {
+            "key": 69,
+            "tickOn": 98400,
+            "tickOff": 98880,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 98880,
+            "tickOff": 99360,
+            "lyric": "こ"
+          },
+          {
+            "key": 69,
+            "tickOn": 99360,
+            "tickOff": 99600,
+            "lyric": "ど"
+          },
+          {
+            "key": 69,
+            "tickOn": 99600,
+            "tickOff": 99840,
+            "lyric": "な"
+          },
+          {
+            "key": 72,
+            "tickOn": 99840,
+            "tickOff": 100080,
+            "lyric": "ら"
+          },
+          {
+            "key": 74,
+            "tickOn": 100080,
+            "tickOff": 100320,
+            "lyric": "し"
+          },
+          {
+            "key": 72,
+            "tickOn": 100320,
+            "tickOff": 100560,
+            "lyric": "な"
+          },
+          {
+            "key": 67,
+            "tickOn": 100560,
+            "tickOff": 100800,
+            "lyric": "が"
+          },
+          {
+            "key": 69,
+            "tickOn": 100800,
+            "tickOff": 101520,
+            "lyric": "ら"
+          },
+          {
+            "key": 67,
+            "tickOn": 101760,
+            "tickOff": 102000,
+            "lyric": "つ"
+          },
+          {
+            "key": 67,
+            "tickOn": 102000,
+            "tickOff": 102240,
+            "lyric": "む"
+          },
+          {
+            "key": 69,
+            "tickOn": 102240,
+            "tickOff": 102480,
+            "lyric": "い"
+          },
+          {
+            "key": 67,
+            "tickOn": 102480,
+            "tickOff": 102720,
+            "lyric": "だ"
+          },
+          {
+            "key": 67,
+            "tickOn": 102720,
+            "tickOff": 102960,
+            "lyric": "こ"
+          },
+          {
+            "key": 69,
+            "tickOn": 102960,
+            "tickOff": 103200,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 103200,
+            "tickOff": 103440,
+            "lyric": "ば"
+          },
+          {
+            "key": 67,
+            "tickOn": 103440,
+            "tickOff": 103680,
+            "lyric": "を"
+          },
+          {
+            "key": 67,
+            "tickOn": 103680,
+            "tickOff": 103920,
+            "lyric": "う"
+          },
+          {
+            "key": 72,
+            "tickOn": 103920,
+            "tickOff": 104160,
+            "lyric": "ち"
+          },
+          {
+            "key": 69,
+            "tickOn": 104160,
+            "tickOff": 104400,
+            "lyric": "こ"
+          },
+          {
+            "key": 67,
+            "tickOn": 104400,
+            "tickOff": 104640,
+            "lyric": "ん"
+          },
+          {
+            "key": 69,
+            "tickOn": 104640,
+            "tickOff": 104880,
+            "lyric": "で"
+          },
+          {
+            "key": 64,
+            "tickOn": 105120,
+            "tickOff": 105360,
+            "lyric": "わ"
+          },
+          {
+            "key": 67,
+            "tickOn": 105360,
+            "tickOff": 105600,
+            "lyric": "た"
+          },
+          {
+            "key": 69,
+            "tickOn": 105600,
+            "tickOff": 106080,
+            "lyric": "し"
+          },
+          {
+            "key": 67,
+            "tickOn": 106080,
+            "tickOff": 106560,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 106560,
+            "tickOff": 106800,
+            "lyric": "う"
+          },
+          {
+            "key": 64,
+            "tickOn": 106800,
+            "tickOff": 107040,
+            "lyric": "た"
+          },
+          {
+            "key": 62,
+            "tickOn": 107040,
+            "tickOff": 107280,
+            "lyric": "を"
+          },
+          {
+            "key": 62,
+            "tickOn": 107280,
+            "tickOff": 107520,
+            "lyric": "う"
+          },
+          {
+            "key": 64,
+            "tickOn": 107520,
+            "tickOff": 107760,
+            "lyric": "た"
+          },
+          {
+            "key": 67,
+            "tickOn": 107760,
+            "tickOff": 107880,
+            "lyric": "あ"
+          },
+          {
+            "key": 67,
+            "tickOn": 107880,
+            "tickOff": 108000,
+            "lyric": ""
+          },
+          {
+            "key": 64,
+            "tickOn": 108000,
+            "tickOff": 108240,
+            "lyric": "て"
+          },
+          {
+            "key": 62,
+            "tickOn": 108240,
+            "tickOff": 108480,
+            "lyric": "い"
+          },
+          {
+            "key": 60,
+            "tickOn": 108480,
+            "tickOff": 108900,
+            "lyric": "る"
+          },
+          {
+            "key": 60,
+            "tickOn": 108960,
+            "tickOff": 109200,
+            "lyric": "こ"
+          },
+          {
+            "key": 62,
+            "tickOn": 109200,
+            "tickOff": 109440,
+            "lyric": "の"
+          },
+          {
+            "key": 64,
+            "tickOn": 109440,
+            "tickOff": 109920,
+            "lyric": "う"
+          },
+          {
+            "key": 72,
+            "tickOn": 109920,
+            "tickOff": 110160,
+            "lyric": "た"
+          },
+          {
+            "key": 69,
+            "tickOn": 110160,
+            "tickOff": 110400,
+            "lyric": "わ"
+          },
+          {
+            "key": 67,
+            "tickOn": 110400,
+            "tickOff": 110880,
+            "lyric": "き"
+          },
+          {
+            "key": 69,
+            "tickOn": 110880,
+            "tickOff": 111120,
+            "lyric": "い"
+          },
+          {
+            "key": 67,
+            "tickOn": 111120,
+            "tickOff": 111240,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 111240,
+            "tickOff": 111360,
+            "lyric": "う"
+          },
+          {
+            "key": 67,
+            "tickOn": 111360,
+            "tickOff": 111600,
+            "lyric": "み"
+          },
+          {
+            "key": 69,
+            "tickOn": 111600,
+            "tickOff": 111840,
+            "lyric": "の"
+          },
+          {
+            "key": 67,
+            "tickOn": 111840,
+            "tickOff": 112080,
+            "lyric": "そ"
+          },
+          {
+            "key": 64,
+            "tickOn": 112080,
+            "tickOff": 112320,
+            "lyric": "こ"
+          },
+          {
+            "key": 62,
+            "tickOn": 112320,
+            "tickOff": 112740,
+            "lyric": "に"
+          },
+          {
+            "key": 60,
+            "tickOn": 112800,
+            "tickOff": 113040,
+            "lyric": "う"
+          },
+          {
+            "key": 62,
+            "tickOn": 113040,
+            "tickOff": 113280,
+            "lyric": "も"
+          },
+          {
+            "key": 64,
+            "tickOn": 113280,
+            "tickOff": 113760,
+            "lyric": "れ"
+          },
+          {
+            "key": 69,
+            "tickOn": 113760,
+            "tickOff": 114240,
+            "lyric": "て"
+          },
+          {
+            "key": 67,
+            "tickOn": 114240,
+            "tickOff": 114480,
+            "lyric": "き"
+          },
+          {
+            "key": 64,
+            "tickOn": 114480,
+            "tickOff": 114720,
+            "lyric": "え"
+          },
+          {
+            "key": 67,
+            "tickOn": 114720,
+            "tickOff": 114960,
+            "lyric": "て"
+          },
+          {
+            "key": 64,
+            "tickOn": 114960,
+            "tickOff": 115200,
+            "lyric": "ゆ"
+          },
+          {
+            "key": 67,
+            "tickOn": 115200,
+            "tickOff": 115440,
+            "lyric": "く"
+          },
+          {
+            "key": 64,
+            "tickOn": 115440,
+            "tickOff": 115680,
+            "lyric": "の"
+          },
+          {
+            "key": 67,
+            "tickOn": 115680,
+            "tickOff": 116160,
+            "lyric": "だ"
+          },
+          {
+            "key": 69,
+            "tickOn": 116160,
+            "tickOff": 116400,
+            "lyric": "ろ"
+          },
+          {
+            "key": 67,
+            "tickOn": 116640,
+            "tickOff": 116880,
+            "lyric": "そ"
+          },
+          {
+            "key": 64,
+            "tickOn": 116880,
+            "tickOff": 117120,
+            "lyric": "れ"
+          },
+          {
+            "key": 62,
+            "tickOn": 117120,
+            "tickOff": 117600,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 117600,
+            "tickOff": 117840,
+            "lyric": "ひ"
+          },
+          {
+            "key": 69,
+            "tickOn": 117840,
+            "tickOff": 118080,
+            "lyric": "と"
+          },
+          {
+            "key": 67,
+            "tickOn": 118080,
+            "tickOff": 118560,
+            "lyric": "ま"
+          },
+          {
+            "key": 69,
+            "tickOn": 118560,
+            "tickOff": 119040,
+            "lyric": "ず"
+          },
+          {
+            "key": 67,
+            "tickOn": 119040,
+            "tickOff": 119280,
+            "lyric": "め"
+          },
+          {
+            "key": 72,
+            "tickOn": 119280,
+            "tickOff": 119520,
+            "lyric": "を"
+          },
+          {
+            "key": 69,
+            "tickOn": 119520,
+            "tickOff": 119760,
+            "lyric": "そ"
+          },
+          {
+            "key": 74,
+            "tickOn": 119760,
+            "tickOff": 120000,
+            "lyric": "ら"
+          },
+          {
+            "key": 72,
+            "tickOn": 120000,
+            "tickOff": 120420,
+            "lyric": "し"
+          },
+          {
+            "key": 64,
+            "tickOn": 120480,
+            "tickOff": 120720,
+            "lyric": "わ"
+          },
+          {
+            "key": 67,
+            "tickOn": 120720,
+            "tickOff": 120960,
+            "lyric": "た"
+          },
+          {
+            "key": 69,
+            "tickOn": 120960,
+            "tickOff": 121200,
+            "lyric": "し"
+          },
+          {
+            "key": 67,
+            "tickOn": 121200,
+            "tickOff": 121440,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 121440,
+            "tickOff": 121680,
+            "lyric": "か"
+          },
+          {
+            "key": 64,
+            "tickOn": 121680,
+            "tickOff": 121920,
+            "lyric": "ん"
+          },
+          {
+            "key": 64,
+            "tickOn": 121920,
+            "tickOff": 122400,
+            "lyric": "せ"
+          },
+          {
+            "key": 62,
+            "tickOn": 122400,
+            "tickOff": 122640,
+            "lyric": "を"
+          },
+          {
+            "key": 60,
+            "tickOn": 122640,
+            "tickOff": 122880,
+            "lyric": "い"
+          },
+          {
+            "key": 62,
+            "tickOn": 122880,
+            "tickOff": 123120,
+            "lyric": "わ"
+          },
+          {
+            "key": 64,
+            "tickOn": 123120,
+            "tickOff": 123360,
+            "lyric": "あ"
+          },
+          {
+            "key": 62,
+            "tickOn": 123360,
+            "tickOff": 123600,
+            "lyric": "て"
+          },
+          {
+            "key": 60,
+            "tickOn": 123600,
+            "tickOff": 123840,
+            "lyric": "い"
+          },
+          {
+            "key": 60,
+            "tickOn": 123840,
+            "tickOff": 124320,
+            "lyric": "る"
+          }
+        ],
+        "pitch": null
+      }
+    ],
+    "timeSignatures": [
+      {
+        "measurePosition": 1,
+        "numerator": 4,
+        "denominator": 4
+      }
+    ],
+    "tempos": [
+      {
+        "tickPosition": 0,
+        "bpm": 140
+      }
+    ],
+    "measurePrefix": 0
+  }
+}
+

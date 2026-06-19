@@ -1,3 +1,0 @@
-[submodule "crates/rust/utaformatix-ts"]
-	path = crates/rust/utaformatix-ts
-	url = https://github.com/sevenc-nanashi/utaformatix-ts

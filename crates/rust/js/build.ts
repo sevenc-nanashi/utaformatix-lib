@@ -13,4 +13,5 @@ await bundle.write({
   file: `${import.meta.dirname}/../src/utaformatix.js`,
   format: "iife",
   name: "utaformatix",
+  minify: true,
 });

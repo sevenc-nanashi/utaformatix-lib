@@ -26,7 +26,7 @@ fn utaformatix_instance() -> utaformatix::base::UtaFormatix {
 #[tokio::test]
 #[traced_test]
 async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
-    let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
+    let data = include_bytes!(concat!("./assets/", path));
     let options = ParseOptions::default();
     let result = utaformatix_instance.function(data, options).await;
 
@@ -43,7 +43,7 @@ async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
 #[tokio::test]
 #[traced_test]
 async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
-    let data = include_bytes!(concat!("../utaformatix-ts/testAssets/", path));
+    let data = include_bytes!(concat!("./assets/", path));
     let options = ParseOptions::default();
     let result = utaformatix_instance.function(&[data], options).await;
 
@@ -60,7 +60,7 @@ async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
 #[tokio::test]
 #[traced_test]
 async fn test_name(utaformatix_instance: utaformatix::base::UtaFormatix) {
-    let data = include_bytes!("../utaformatix-ts/testAssets/generated/standard.mid");
+    let data = include_bytes!("./assets/generated/standard.mid");
     let ufdata = utaformatix_instance
         .parse_standard_mid(data, ParseOptions::default())
         .await
