@@ -14,8 +14,8 @@ utaformatix-lib is a library that allows you to use UtaFormatix in many programm
 
 ## How does it work?
 
-- The library contains a JS runtime. It uses [Boa JS](https://boajs.dev) by default, and can use QuickJS with the `quickjs` feature.
-  - To use QuickJS without Boa, enable `quickjs` with `default-features = false`.
+- This library contains a JS runtime. It uses [QuickJS](https://bellard.org/quickjs/) by default, and can use [Boa JS](https://boajs.dev) with the `boa` feature.
+  - To use Boa without QuickJS, enable `boa` with `default-features = false`. As Boa JS is pure-rust, you can create pure-rust binaries without any C/C++ dependencies, but it causes significant performance degradation.
 - The library embeds [utaformatix-ts](https://github.com/sevenc-nanashi/utaformatix-ts), and uses it to run UtaFormatix code.
   - There are some polyfills for filling the gap between Node.js and the embedded JS runtime. See [crates/rust/js] for details.
 
